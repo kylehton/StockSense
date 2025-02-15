@@ -1,10 +1,12 @@
 'use client';
 import dotenv from "dotenv";
 import { useEffect } from "react";
+import { useRouter } from 'next/navigation';  
 
 const GoogleSignIn = () => {
     dotenv.config();
     const clientID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const router = useRouter();
 
     // unable to read from .env file, so manually insert the clientID when using localhost, and 
     // revert back to this when pushing onto main branch for deployment
@@ -50,6 +52,7 @@ const GoogleSignIn = () => {
         console.log("Token credentials:", response.credential);
         console.log("User ID:", payload["sub"]);// accesses the user ID from token
         
+        router.push('/dashboard');
       };
     };
   
