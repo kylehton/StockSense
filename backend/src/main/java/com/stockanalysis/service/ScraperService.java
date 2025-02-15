@@ -24,7 +24,7 @@ public class ScraperService {
         String scrapedData = webScraper.scrapeWebsite(url);
 
         // Generate a unique filename
-        String objectKey = "scraped_data/" + UUID.randomUUID() + ".json";
+        String objectKey = "scraped_data/" + url.substring(8) + ".txt";
 
         // Upload the scraped data to S3
         try{
