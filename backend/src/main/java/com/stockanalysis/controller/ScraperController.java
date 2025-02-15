@@ -18,6 +18,7 @@ public class ScraperController {
 
     @GetMapping("/scrape")
     public String scrapeWebsite(@RequestParam String url) {
-        return scraperService.scrape(url);
+        String completedText = scraperService.scrape(url);
+        return completedText;
     }
 }
