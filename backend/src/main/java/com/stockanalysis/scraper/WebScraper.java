@@ -43,9 +43,14 @@ public class WebScraper {
             Document doc = Jsoup.parse(pageSource);
             doc.select("a").remove(); // Remove all links
 
-            String articleText = doc.select("div.article").text(); 
+            // extracts text within div with class "article" if it exists
+            String articleText = doc.select("div.article").text();
+            if (articleText.isEmpty()) {
+                articleText = doc.select("article").text();
+            }
 
-        return articleText.isEmpty() ? doc.text() : articleText;
+            return articleText.isEmpty() ? doc.text() : articleText;
+
         } catch (Exception e) {
             e.printStackTrace();
             return "Error scraping website: " + e.getMessage();
