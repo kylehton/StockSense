@@ -1,4 +1,3 @@
-import { Menu } from "@mui/material";
 import GoogleSignIn from "./components/GoogleSignIn";
 
 export default function Home() {

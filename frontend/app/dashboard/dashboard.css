@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:root {
+  --background: #48505D;
+  --foreground: #ffffff;
+}
+
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+.inter {
+  font-family: Inter, sans-serif;
+}
+
+.space-grotesk {
+  font-family: 'Space Grotesk', sans-serif;
+}
