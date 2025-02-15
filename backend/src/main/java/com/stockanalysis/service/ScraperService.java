@@ -24,11 +24,11 @@ public class ScraperService {
         String scrapedData = webScraper.scrapeWebsite(url);
 
         // Generate a unique filename
-        String objectKey = "scraped_data/" + url.substring(8) + ".txt";
+        String objectKey = "scraped_data/" + UUID.randomUUID() + ".txt";
 
         // Upload the scraped data to S3
         try{
-          s3Service.uploadScrapedData(objectKey, scrapedData);  
+          s3Service.uploadScrapedData(objectKey, scrapedData);
         }
         catch(Exception e){
           return "Error uploading to S3: " + e.getMessage();
