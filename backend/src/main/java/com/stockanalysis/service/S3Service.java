@@ -1,5 +1,7 @@
 package com.stockanalysis.service;
 
+import com.stockanalysis.config.AWSConfig;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -19,30 +21,13 @@ import org.springframework.stereotype.Service;
 public class S3Service {
 
     private final S3Client s3Client;
-
-    private String accessKey;
-    private String secretKey;
-    private String region;
     private String bucketName;
 
     @Autowired
-    public S3Service() {
+    public S3Service(AWSConfig awsConfig) {
         // Load environment variables using dotenv if not already set
-        Dotenv dotenv = Dotenv.load();
-        
-        // Set the environment variables
-        this.accessKey = dotenv.get("AWS_ACCESS_KEY");
-        this.secretKey = dotenv.get("AWS_SECRET_KEY");
-        this.region = dotenv.get("AWS_REGION");
-        this.bucketName = dotenv.get("AWS_BUCKET_NAME");
-
-        // Initialize S3 client with credentials
-        s3Client = S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
-                .build();
-
-        s3Client.listBuckets();
+        this.s3Client = awsConfig.buildS3Client();
+        this.bucketName = awsConfig.getBucketName();
     }
 
     public void uploadScrapedData(String key, Object data) {

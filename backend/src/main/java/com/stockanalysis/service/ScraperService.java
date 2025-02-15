@@ -35,6 +35,6 @@ public class ScraperService {
         }
 
         // Return the S3 URL of the uploaded file
-        return "Scraped data uploaded to S3: https://s3.amazonaws.com/watchlist-links/" + objectKey + "\t\n\n" + scrapedData;
+        return "Scraped data uploaded to S3: https://s3.amazonaws.com/news-watchlist-links/" + objectKey + "\t\n\n" + scrapedData;
     }
 }
