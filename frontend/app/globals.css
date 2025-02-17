@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
 
 :root {
   --background: #333333;
@@ -13,6 +12,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
+  font-family: "Lexend", sans-serif;
 }
 
 .inter {

@@ -86,6 +86,13 @@
             <version>3.0.0</version>
         </dependency>
 
+        <!-- JSON Dependency for API JSON parsing -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version>
+        </dependency>
+
     </dependencies>
 
     <build>
