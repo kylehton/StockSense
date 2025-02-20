@@ -2,9 +2,11 @@ package com.stockanalysis.service;
 
 import com.stockanalysis.config.AWSConfig;
 
-
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -46,6 +48,20 @@ public class S3Service {
             System.err.println("Error converting data to JSON: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Error uploading to S3: " + e.getMessage());
+        }
+    }
+
+    public String readObjectContent(String objectKey) {
+        String fullObjectKey = "scraped_data/" + objectKey + ".txt";
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fullObjectKey)
+                .build();
+
+        try (ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest)) {
+            return new String(response.readAllBytes());
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading object from S3", e);
         }
     }
 }

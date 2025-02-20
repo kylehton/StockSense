@@ -24,6 +24,11 @@ public class WebScraper {
         options.addArguments("--enable-javascript"); // Explicitly enable JS
         options.addArguments("--remote-debugging-port=9222"); // Debugging option
 
+        // Add stealth options to prevent blocking of webscraper
+        options.addArguments("--disable-blink-features=AutomationControlled"); // Disable automation flag to block detection
+        options.addArguments("user-agent=Mozilla/5.0"); // Set a std. user agent
+
+
         // Initialize WebDriver (Chromium-based browsers)
         this.driver = new ChromeDriver(options);
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // Max wait time
