@@ -1,7 +1,5 @@
 package com.stockanalysis.service;
 
-import java.util.ArrayList;
-
 import org.springframework.stereotype.Service;
 
 import java.net.http.HttpClient;
@@ -37,6 +35,8 @@ public class GenerateNewsService {
             JSONArray newsArray = jsonResponse.getJSONArray("news");
 
             // Loop through the news items and print title, publisher, and link
+            // Store the first 5 items in newsInfo
+            // Columns are: Article Title (0), Publisher (1), Link (2)
             for (int i = 0; i < 5; i++) {
                 JSONObject newsItem = newsArray.getJSONObject(i);
                 newsInfo[0][i] = newsItem.getString("title");
