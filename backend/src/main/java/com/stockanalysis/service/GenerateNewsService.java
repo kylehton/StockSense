@@ -2,6 +2,8 @@ package com.stockanalysis.service;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -14,7 +16,9 @@ import org.json.JSONObject;
 public class GenerateNewsService {
 
     
-    public String[][] generateNews(String stockSymbol) {
+    public String[][] generateNews(String stockSymbol, String userid) {
+
+        System.out.println("User ID: " + userid);
 
         String[][] newsInfo = new String[3][5];
         // Placeholder for news generation
@@ -44,6 +48,7 @@ public class GenerateNewsService {
                 newsInfo[2][i] = newsItem.getString("link");
 
             }
+            System.out.println("News generated for user: " + userid);
             System.out.println(newsInfo[0][0]);
             System.out.println(newsInfo[1][0]);
             System.out.println(newsInfo[2][0]);
