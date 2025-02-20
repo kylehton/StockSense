@@ -1,11 +1,11 @@
 package com.stockanalysis.scraper;
 
+import com.stockanalysis.config.ChromeDriverConfig;
+
 import java.time.Duration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
@@ -15,22 +15,8 @@ public class WebScraper {
     private WebDriver driver;
     private WebDriverWait wait;
 
-    public WebScraper() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // Run in headless mode (no GUI)
-        options.addArguments("--disable-gpu"); // Disable GPU acceleration
-        options.addArguments("--no-sandbox"); // Improve security
-        options.addArguments("--disable-dev-shm-usage"); // Prevent crashes
-        options.addArguments("--enable-javascript"); // Explicitly enable JS
-        options.addArguments("--remote-debugging-port=9222"); // Debugging option
-
-        // Add stealth options to prevent blocking of webscraper
-        options.addArguments("--disable-blink-features=AutomationControlled"); // Disable automation flag to block detection
-        options.addArguments("user-agent=Mozilla/5.0"); // Set a std. user agent
-
-
-        // Initialize WebDriver (Chromium-based browsers)
-        this.driver = new ChromeDriver(options);
+    public WebScraper(ChromeDriverConfig chromeDriverConfig) {
+        this.driver = chromeDriverConfig.createChromeDriver();
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // Max wait time
     }
 
