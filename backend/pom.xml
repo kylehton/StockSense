@@ -26,10 +26,6 @@
 
     <dependencies>
         <!-- Spring Boot Dependencies -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
         
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -94,6 +90,15 @@
             <artifactId>google-auth-library-oauth2-http</artifactId>
             <version>1.32.1</version>
         </dependency>
+
+        <!-- Guava Dependency -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.0.1-jre</version>
+            <scope>compile</scope>
+        </dependency>
+
 
         
 
