@@ -2,6 +2,7 @@ package com.stockanalysis.scraper;
 
 import com.stockanalysis.config.ChromeDriverConfig;
 
+
 import java.time.Duration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,6 +20,7 @@ public class WebScraper {
         this.driver = chromeDriverConfig.createChromeDriver();
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // Max wait time
     }
+
 
     public String scrapeWebsite(String url) {
         try {
