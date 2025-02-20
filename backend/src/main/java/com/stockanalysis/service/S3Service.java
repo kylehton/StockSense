@@ -64,14 +64,4 @@ public class S3Service {
             throw new RuntimeException("Error reading object from S3", e);
         }
     }
-
-    public boolean checkS3Connection() {
-        try {
-            s3Client.listBuckets(); // Tries to list S3 buckets
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 }

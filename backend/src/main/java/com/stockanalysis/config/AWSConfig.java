@@ -1,6 +1,5 @@
 package com.stockanalysis.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -28,7 +27,6 @@ public class AWSConfig {
 
     }
 
-    @Bean
     public S3Client buildS3Client() {
         return S3Client.builder()
                 .region(Region.of(region))
