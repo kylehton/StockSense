@@ -5,7 +5,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class GoogleAuthenticationService {
 
+
+    public GoogleAuthenticationService() {
+   
+}
+
     public void authenticate(String idToken) {
-        String temp = "test";
+
     }
 }
