@@ -1,11 +1,11 @@
-import GoogleSignIn from "./components/GoogleSignIn";
+import  SignInModal from "./components/SignInModal";
 
 export default function Home() {
   return (
     <div id="page-wrapper" className="flex h-screen w-full">
       <div className="flex flex-col items-center">
         <div id='google-sign-in-wrapper' className='absolute top-4 right-8'>
-          <GoogleSignIn />
+          <SignInModal />
         </div>
         <div id='intro-text-wrapper' className='mt-36 ml-24'>
           <h1 className="font-bold text-6xl mb-4">StockSense</h1>
