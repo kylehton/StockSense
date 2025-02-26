@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @RestController
@@ -26,19 +27,19 @@ public class GoogleAuthenticationController {
     }
 
     @GetMapping("/auth")
-    public ResponseEntity<String> authenticateUser(@RequestParam String id, HttpSession session)
-    {
-        System.out.println("Authentication process beginning...");
+    public ResponseEntity<String> authenticateUser(@RequestParam String id, HttpSession session) {
         try {
+            
+            // Rest of your authentication code...
             GoogleIdToken.Payload payload = googleAuthenticationService.authenticate(id);
             String userId = payload.getSubject();
+            
+            System.out.println("Current Session ID: " + session.getId());
             session.setAttribute("USER_ID", userId);
-            session.setAttribute("EMAIL", payload.get("email"));
-            System.out.println("Authentication successful for user: " + payload.get("email"));
-            return ResponseEntity.ok("Authenticated the following user: " + payload.get("email"));
+            
+            return ResponseEntity.ok("Authenticated user: " + payload.get("email"));
         } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Authentication failed due to an error: " + e.getMessage());
+            return ResponseEntity.status(500).body("Authentication error: " + e.getMessage());
         }
     }
 
