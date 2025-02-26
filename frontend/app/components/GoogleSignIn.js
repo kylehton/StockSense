@@ -49,6 +49,7 @@ const GoogleSignIn = () => {
       if (response.credential) {
         //response.credential is the JWT token for the authenticated user
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
+        console.log("Creds:",response.credential);
 
         const res = await fetch(`http://localhost:8080/google/auth?id=${response.credential}`, {
           method: "GET", 
