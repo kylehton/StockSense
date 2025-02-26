@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -47,6 +48,29 @@ public class DBController {
     public ArrayList<String> getSymbolsFromDB(HttpSession session) {
         return dbService.getSymbols(session, this.stmt);
     }
+
+    @RequestMapping("/add")
+    public String addToDB(HttpSession session, @RequestParam String symbol) {
+        try{
+        dbService.addSymbol(session, this.stmt, symbol);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to add symbol: "+e;
+        }
+        return "Successfully added symbol: "+symbol;
+    }
+
+    @RequestMapping("/delete")
+    public String DeleteFromDB(HttpSession session, @RequestParam String symbol) {
+        try{
+        dbService.deleteSymbol(session, this.stmt, symbol);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to add symbol: "+e;
+        }
+        return "Successfully added symbol: "+symbol;
+    }
+
 }
 
 
