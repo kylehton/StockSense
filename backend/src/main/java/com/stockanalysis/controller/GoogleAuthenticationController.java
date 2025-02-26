@@ -26,14 +26,14 @@ public class GoogleAuthenticationController {
     }
 
     @GetMapping("/auth")
-    public ResponseEntity<String> authenticateUser(@RequestParam String idToken, HttpSession session)
+    public ResponseEntity<String> authenticateUser(@RequestParam String id, HttpSession session)
     {
         System.out.println("Authentication process beginning...");
         try {
-            GoogleIdToken.Payload payload = googleAuthenticationService.authenticate(idToken);
+            GoogleIdToken.Payload payload = googleAuthenticationService.authenticate(id);
             String userId = payload.getSubject();
             session.setAttribute("USER_ID", userId);
-            System.out.println("User ID: " + session.getAttribute("USER_ID"));
+            session.setAttribute("EMAIL", payload.get("email"));
             return ResponseEntity.ok("Authenticated the following user: " + payload.get("email"));
         } catch (IOException e) {
             e.printStackTrace();
