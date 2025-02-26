@@ -38,9 +38,6 @@ public class DBController {
                 System.out.println("Email: " + email);
             }
 
-            // Close the connections
-            rs.close();
-            stmt.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,7 +45,6 @@ public class DBController {
 
     @RequestMapping("/getsymbols")
     public ArrayList<String> getSymbolsFromDB(HttpSession session) {
-        System.out.println("ID: " + session.getAttribute("USER_ID"));
         return dbService.getSymbols(session, this.stmt);
     }
 }

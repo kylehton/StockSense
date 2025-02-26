@@ -31,6 +31,7 @@ public class GoogleAuthenticationController {
         try {
             
             // Rest of your authentication code...
+            System.out.println(id);
             GoogleIdToken.Payload payload = googleAuthenticationService.authenticate(id);
             String userId = payload.getSubject();
             
