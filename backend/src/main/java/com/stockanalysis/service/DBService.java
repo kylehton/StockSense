@@ -84,7 +84,7 @@ public class DBService {
         }
     }
 
-    public void deleteSymbol(HttpSession session, Statement stmt, String symbol) {
+    public String deleteSymbol(HttpSession session, Statement stmt, String symbol) {
         try {
             // Get connection from the statement
             Connection conn = stmt.getConnection();
@@ -98,9 +98,13 @@ public class DBService {
             
             // Execute the update
             pstmt.executeUpdate();
+            return "Successfully deleted symbol: "+symbol;
+
 
         } catch (Exception e) {
             e.printStackTrace();
+            return "Failed to delete symbol: "+symbol;
+
         }
     }
 }
