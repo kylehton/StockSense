@@ -5,29 +5,36 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Configuration
 public class ChromeDriverConfig {
-
-    private WebDriver driver;
+    
+    private static final Logger logger = LoggerFactory.getLogger(ChromeDriverConfig.class);
 
     @Bean
     public WebDriver createChromeDriver() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // Run in headless mode (no GUI)
-        options.addArguments("--disable-gpu"); // Disable GPU acceleration
-        options.addArguments("--no-sandbox"); // Improve security
-        options.addArguments("--disable-dev-shm-usage"); // Prevent crashes
-        options.addArguments("--enable-javascript"); // Explicitly enable JS
-        options.addArguments("--remote-debugging-port=9222"); // Debugging option
-
-        // Add stealth options to prevent blocking of webscraper
-        options.addArguments("--disable-blink-features=AutomationControlled"); // Disable automation flag to block detection
-        options.addArguments("user-agent=Mozilla/5.0"); // Set a std. user agent
-
-
-        // Initialize WebDriver (Chromium-based browsers)
-        this.driver = new ChromeDriver(options);
-        return this.driver;
+        try {
+            WebDriverManager.chromedriver().browserVersion("133").setup();
+            
+            ChromeOptions options = new ChromeOptions();
+            
+            // Essential options only for M3 Mac compatibility
+            options.addArguments("--headless=new");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--remote-allow-origins=*");
+            options.addArguments("--window-size=1920,1080");
+            options.addArguments("--enable-javascript");
+            
+            logger.info("Initializing Chrome WebDriver with minimal options");
+            return new ChromeDriver(options);
+            
+        } catch (Exception e) {
+            logger.error("Failed to create Chrome WebDriver: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to initialize Chrome WebDriver", e);
+        }
     }
 }
