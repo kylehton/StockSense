@@ -49,10 +49,21 @@ const GoogleSignIn = () => {
       if (response.credential) {
         //response.credential is the JWT token for the authenticated user
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
-        console.log("Token credentials:", response.credential);
-        console.log("User ID:", payload["sub"]);// accesses the user ID from token
-        
-        router.push('/dashboard');
+
+        const res = await fetch(`http://localhost:8080/google/auth?id=${response.credential}`, {
+          method: "GET", 
+          headers: {
+              "Content-Type": "application/json",
+          },
+        });
+        if (res.ok) {
+          console.log(res.text());
+          router.push('/dashboard');
+        }
+        else {
+          alert("Failed to authenticate Google account. Please try again.");
+        }
+
       };
     };
   

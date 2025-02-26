@@ -26,17 +26,15 @@ public class GoogleAuthenticationService {
 
 
     public GoogleIdToken.Payload authenticate(String IDToken) throws IOException {
-        System.out.println("now in authenticate function");
+        System.out.println("Running: authenticate() function . . .");
 
         try {
-            System.out.println(client_id);
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, gsonFactory)
                 .setAudience(Arrays.asList(client_id))
                 .build();
 
             GoogleIdToken idToken = verifier.verify(IDToken);
             if (idToken != null) {
-                System.out.println("Payload: " + idToken.getPayload());
                 return idToken.getPayload();
             } else {
                 throw new IOException("Invalid ID token.");
