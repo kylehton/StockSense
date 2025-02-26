@@ -34,6 +34,7 @@ public class GoogleAuthenticationController {
             String userId = payload.getSubject();
             session.setAttribute("USER_ID", userId);
             session.setAttribute("EMAIL", payload.get("email"));
+            System.out.println("Authentication successful for user: " + payload.get("email"));
             return ResponseEntity.ok("Authenticated the following user: " + payload.get("email"));
         } catch (IOException e) {
             e.printStackTrace();
