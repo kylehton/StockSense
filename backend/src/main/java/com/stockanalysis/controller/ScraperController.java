@@ -2,7 +2,7 @@ package com.stockanalysis.controller;
 
 import com.stockanalysis.service.ScraperService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +17,7 @@ public class ScraperController {
         this.scraperService = scraperService;
     }
 
-    @GetMapping("/scrape")
+    @PostMapping("/scrape")
     public String scrapeWebsite(@RequestParam String url) {
         String completedText = scraperService.scrape(url);
         return completedText;
