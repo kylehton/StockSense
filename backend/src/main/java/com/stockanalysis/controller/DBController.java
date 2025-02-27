@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,7 +63,7 @@ public class DBController {
         return "Successfully added symbol: "+symbol;
     }
 
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public String DeleteFromDB(HttpSession session, @RequestParam String symbol) {
         try{
         dbService.deleteSymbol(session, this.stmt, symbol);

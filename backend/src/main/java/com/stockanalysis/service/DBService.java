@@ -68,7 +68,7 @@ public class DBService {
             Connection conn = stmt.getConnection();
             
             // Use PreparedStatement to prevent SQL injection
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO stocks (user_id, symbol) VALUES (?, ?)");
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO stocks (user_id, symbol) VALUES (?, ?) ON CONFLICT (user_id, symbol) DO NOTHING");
             String google_id = (String) session.getAttribute("USER_ID");
             int user_id = getId(google_id, stmt);
             pstmt.setInt(1, user_id);
@@ -76,6 +76,7 @@ public class DBService {
             
             // Execute the update
             pstmt.executeUpdate();
+            System.out.println("Added symbol: "+symbol);
             return "Successfully added symbol: "+symbol;
 
         } catch (Exception e) {
@@ -98,6 +99,7 @@ public class DBService {
             
             // Execute the update
             pstmt.executeUpdate();
+            System.out.println("Deleted symbol: "+symbol);
             return "Successfully deleted symbol: "+symbol;
 
 

@@ -22,9 +22,9 @@ public class GoogleSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable()) // Temporarily disable CSRF
+            .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)) // ✅ Always use existing session
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)) 
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll());
 
@@ -38,8 +38,8 @@ public class GoogleSecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "X-XSRF-TOKEN"));
-        configuration.setAllowCredentials(true); // ✅ Ensure cookies are allowed
-        configuration.setExposedHeaders(List.of("Set-Cookie")); // ✅ Expose Set-Cookie header
+        configuration.setAllowCredentials(true); 
+        configuration.setExposedHeaders(List.of("Set-Cookie")); 
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
