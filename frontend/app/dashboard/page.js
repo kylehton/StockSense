@@ -6,7 +6,43 @@ export default function Dashboard() {
 
     const [watchlist, setWatchlist] = useState([]);
 
-    
+    useEffect(() => {
+        async function loadWatchlist() {
+        console.log("Loading watchlist from DB . . .")
+
+        const response = await fetch('http://localhost:8080/getsymbols?Cookie=9474BFA31B89B291BB4C0F23FFE143AD', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then((response) => {
+            console.log("Response Headers:", response.headers);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            console.log("Watchlist data:", data);
+            setWatchlist(data); 
+        })
+        .catch((error) => console.error("Error loading watchlist:", error));
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null; // Cookie not found
+          }
+          
+          // Log the JSESSIONID to the console
+          const jsessionId = getCookie('JSESSIONID');
+          console.log("JSESSIONID: ", jsessionId);
+        loadWatchlist();
+    }, []);
 
     return (
         <div id="page-wrapper" className="text-zinc-800 flex h-screen w-full items-center justify-between">

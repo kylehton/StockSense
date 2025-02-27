@@ -52,7 +52,8 @@ const GoogleSignIn = () => {
         console.log("Creds:",response.credential);
 
         const res = await fetch(`http://localhost:8080/google/auth?id=${response.credential}`, {
-          method: "GET", 
+          method: "POST",
+          credentials: "include", 
           headers: {
               "Content-Type": "application/json",
           },
