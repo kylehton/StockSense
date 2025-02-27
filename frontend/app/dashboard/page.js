@@ -1,81 +1,142 @@
 'use client';
 import './dashboard.css';
 import React, { useState, useEffect } from 'react';
+import { MinusIcon } from 'lucide-react';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+ 
 
 export default function Dashboard() {
 
     const [watchlist, setWatchlist] = useState([]);
+    const [symbol, setSymbol] = useState("");
 
-    useEffect(() => {
-        async function loadWatchlist() {
-        console.log("Loading watchlist from DB . . .")
 
-        const response = await fetch('http://localhost:8080/getsymbols?Cookie=9474BFA31B89B291BB4C0F23FFE143AD', {
-            method: 'GET',
+    const handleAddSymbol = () => {
+        const response = fetch(`http://localhost:8080/add?symbol=${symbol}`, {
+            method: 'POST',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             }
         })
         .then((response) => {
-            console.log("Response Headers:", response.headers);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response.json();
+            return response.text();
         })
-        .then((data) => {
-            console.log("Watchlist data:", data);
-            setWatchlist(data); 
+        .catch((error) => console.error("Error adding symbol:", error));
+        setSymbol("");
+    };
+
+    const handleDeleteSymbol = () => {
+        const response = fetch(`http://localhost:8080/delete?symbol=${symbol}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            }
         })
-        .catch((error) => console.error("Error loading watchlist:", error));
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .catch((error) => console.error("Error deleting symbol:", error));
+        setSymbol("");
+    }
+
+    useEffect(() => {
+        async function loadWatchlist() {
+            const response = await fetch('http://localhost:8080/getsymbols', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log("Watchlist data:", data);
+                setWatchlist(data); 
+            })
+            .catch((error) => console.error("Error loading watchlist:", error));
         }
 
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-            return null; // Cookie not found
-          }
-          
-          // Log the JSESSIONID to the console
-          const jsessionId = getCookie('JSESSIONID');
-          console.log("JSESSIONID: ", jsessionId);
         loadWatchlist();
     }, []);
 
     return (
         <div id="page-wrapper" className="text-zinc-800 flex h-screen w-full items-center justify-between">
-            <div id="watchlist-wrapper" className="rounded-lg ml-16 h-4/5 w-1/4 bg-white opacity-70 flex flex-col p-4">
-                <div id="watchlist-header" className="flex items-center justify-between">
-                    <h1 className="font-bold text-xl">Watchlist</h1>
-                    <button 
-                        id="add-to-watchlist" 
-                        className="ml-2 w-8 h-8 flex items-center justify-center border border-zinc-600 rounded-full text-lg leading-none  font-bold hover:bg-gray-100"
-                    >
-                        <span className='mb-[2px]'>
-                            +
-                            </span>
-                    </button>
+            <div id="watchlist-wrapper" className="rounded-lg ml-16 h-4/5 w-1/4 bg-white flex flex-col p-4">
+                <div id="watchlist-header" className="flex items-center justify-between mb-4">
+                    <h1 className="font-bold text-xl">Watchlist</h1> 
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button type="submit" className="ml-auto px-4">
+                                    <span className='mb-[2px]'>+</span>
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px] bg-zinc-900 opacity-100">
+                                <DialogHeader>
+                                <DialogTitle>Add a Stock Symbol</DialogTitle>
+                                <DialogDescription>
+                                    Type the 4-character stock symbol you would like to add, then press the 'Add' button.
+                                </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="name" className="text-right">
+                                    Symbol
+                                    </Label>
+                                    <Input id="name" value={symbol} onChange={(e) => setSymbol(e.target.value)}
+                                     placeholder="AMZN, TSLA . . ." className="col-span-3" />
+                                </div>
+                                </div>
+                                <DialogFooter>
+                                <Button className='bg-white text-black font-bold' type="submit" onClick={handleAddSymbol}>Add</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                            </Dialog>
                 </div>
+
                 <div id="watchlist-components" className="mt-4">
-                    {watchlist.map((stock, index) => {
-                            <div key={index} className="flex items-center justify-between">
-                                <h1 className="font-bold text-lg">{stock}</h1>
-                                <button 
-                                    id="remove-from-watchlist" 
-                                    className="ml-2 w-8 h-8 flex items-center justify-center border border-zinc-600 rounded-full text-lg leading-none  font-bold hover:bg-gray-100"
-                                >
-                                    <span className='mb-[2px]'>
-                                        -
-                                    </span>
-                                </button>
-                            </div>
-                        }
-                    )}   
+                {watchlist.map((stock, index) => (
+                    <div key={index} className="flex items-center justify-between mb-1">
+                        <h1 className="font-bold text-lg">
+                        <Button variant="ghost">{stock}</Button>
+                        </h1>
+                        <Button className='w-5 h-5 mr-[10px] bg-black' type='submit' size="icon"
+                            onClick={() => {
+                                setSymbol(stock.toString());
+                                handleDeleteSymbol();
+                            }}
+                        >
+                            <MinusIcon className='text-white' />
+                        </Button>
+                        
+                    </div>
+                ))}
                 </div>
             </div>
-            <div id="stock-data-wrapper" className="rounded-lg mr-16 h-[90%] w-[50%] bg-white opacity-70 flex items-center justify-center">
+            <div id="stock-data-wrapper" className="rounded-lg mr-16 h-[90%] w-[50%] bg-white flex items-center justify-center">
                 <h1 className='text-2xl'>Select a symbol from your watchlist.</h1>
             </div>
         </div>
