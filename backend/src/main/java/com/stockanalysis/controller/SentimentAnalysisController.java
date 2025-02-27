@@ -16,7 +16,7 @@ public class SentimentAnalysisController {
         this.sentimentAnalysisService = sentimentAnalysisService;
     }
     
-    @GetMapping("/analyze-sentiment")
+    @PostMapping("/analyze-sentiment")
     public String analyze(@RequestParam String key) {
         String results = sentimentAnalysisService.analyzeSentiment(key);
         return "Sentiment analysis result for key: " + key + "\tResults: "+ results;
