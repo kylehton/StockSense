@@ -61,19 +61,7 @@ public class DBController {
     public Boolean checkUser(HttpSession session) {
         String google_id = session.getAttribute("USER_ID").toString();
         System.out.println("User Check Results: "+dbService.checkUserExists(google_id, this.stmt));
-        boolean exists = dbService.checkUserExists(google_id, this.stmt);
-        if (!exists) {
-            try{
-            String email = session.getAttribute("EMAIL").toString();
-            String addUser = dbService.addUserToDB(google_id, email, this.stmt);
-            System.out.println(addUser);
-            return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-        return true;
+        return dbService.checkUserExists(google_id, this.stmt);
     }
 
     @PostMapping("/adduser")
