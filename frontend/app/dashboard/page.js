@@ -76,10 +76,8 @@ export default function Dashboard() {
             return await result;
         }
 
-        async function addUser(exists) {
-            if (!exists) {
-                console.log("User does not exist, creating new user.");
-
+        async function addUser() {
+                console.log("User does not exist, creating new user.")
                 const response = await fetch('http://localhost:8080/adduser', {
                     method: 'POST',
                     credentials: 'include',
@@ -89,8 +87,7 @@ export default function Dashboard() {
                 }
                 const result = await response.json();
                 console.log("Result of add:", result);
-            }
-            return;
+            
         }
         
 
@@ -114,7 +111,9 @@ export default function Dashboard() {
             })
             .catch((error) => console.error("Error loading watchlist:", error));
         }
-        checkUser();
+        if(checkUser() == false) {
+            addUser();
+        }
         loadWatchlist();
     }, []);
 
