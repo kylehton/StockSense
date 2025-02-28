@@ -6,15 +6,52 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-import jakarta.servlet.http.HttpSession;
 
 public class DBService {
 
-    public int getId(String google_id, Statement stmt) {
+    public Boolean checkUserExists(String google_id, Statement stmt) {
         try {
-            // Get connection from the statement
             Connection conn = stmt.getConnection();
+            // Use PreparedStatement to prevent SQL injection
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM users WHERE google_id = ?");
+            pstmt.setString(1, google_id);
             
+            // Execute the query and get a ResultSet
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // true if user exists, else false
+                return true;
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public String addUserToDB(String google_id, String email, Statement stmt){
+        try {
+            Connection conn = stmt.getConnection();
+            // Use PreparedStatement to prevent SQL injection
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO users (email, google_id) VALUES (?, ?)");
+            pstmt.setString(1, email);
+            pstmt.setString(2, google_id);
+            
+            // Execute the update
+            pstmt.executeUpdate();
+            System.out.println("Added user: "+google_id);
+            return "Successfully added user: "+email;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to add user: "+e;
+        }
+    }
+
+    public int getId(String google_id, Statement stmt) {
+        try {            
+            Connection conn = stmt.getConnection(); 
             // Use PreparedStatement to prevent SQL injection
             PreparedStatement pstmt = conn.prepareStatement("SELECT id FROM users WHERE google_id = ?");
             pstmt.setString(1, google_id);
@@ -35,14 +72,11 @@ public class DBService {
         return -1;
     }
 
-    public ArrayList<String> getSymbols(HttpSession session, Statement stmt) {
+    public ArrayList<String> getSymbols(String google_id, Statement stmt) {
         ArrayList<String> symbols = new ArrayList<>();
         try {
-
             Connection conn = stmt.getConnection();
-
             // Execute a query and get a ResultSet
-            String google_id = (String) session.getAttribute("USER_ID");
             System.out.println("Google ID: "+google_id);
             int user_id = getId(google_id, stmt);
             PreparedStatement pstmt = conn.prepareStatement("SELECT symbol FROM stocks WHERE user_id = ?");
@@ -62,14 +96,11 @@ public class DBService {
         return symbols;
     }
 
-    public String addSymbol(HttpSession session, Statement stmt, String symbol) {
+    public String addSymbol(String google_id, Statement stmt,  String symbol) {
         try {
-            // Get connection from the statement
             Connection conn = stmt.getConnection();
-            
             // Use PreparedStatement to prevent SQL injection
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO stocks (user_id, symbol) VALUES (?, ?) ON CONFLICT (user_id, symbol) DO NOTHING");
-            String google_id = (String) session.getAttribute("USER_ID");
             int user_id = getId(google_id, stmt);
             pstmt.setInt(1, user_id);
             pstmt.setString(2, symbol);
@@ -85,14 +116,11 @@ public class DBService {
         }
     }
 
-    public String deleteSymbol(HttpSession session, Statement stmt, String symbol) {
+    public String deleteSymbol(String google_id, Statement stmt, String symbol) {
         try {
-            // Get connection from the statement
             Connection conn = stmt.getConnection();
-            
             // Use PreparedStatement to prevent SQL injection
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM stocks WHERE user_id = ? AND symbol = ?");
-            String google_id = (String) session.getAttribute("USER_ID");
             int user_id = getId(google_id, stmt);
             pstmt.setInt(1, user_id);
             pstmt.setString(2, symbol);

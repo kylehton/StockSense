@@ -23,6 +23,7 @@ export default function Dashboard() {
 
 
     const handleAddSymbol = () => {
+        console.log("Adding symbol:", symbol);
         const response = fetch(`http://localhost:8080/add?symbol=${symbol}`, {
             method: 'POST',
             credentials: 'include',
@@ -40,8 +41,9 @@ export default function Dashboard() {
         setSymbol("");
     };
 
-    const handleDeleteSymbol = () => {
-        const response = fetch(`http://localhost:8080/delete?symbol=${symbol}`, {
+    const handleDeleteSymbol = (stockSymbol) => {
+        console.log("Deleting symbol:", stockSymbol);
+        const response = fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
             method: 'DELETE',
             credentials: 'include',
             headers: {
@@ -59,6 +61,39 @@ export default function Dashboard() {
     }
 
     useEffect(() => {
+
+        // Check if user exists, returns true if user exists, false if not
+        async function checkUser() {
+            const response = await fetch('http://localhost:8080/check', {
+                method: 'GET',
+                credentials: 'include',
+            })
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const result = await response.json();
+            console.log("User exists:", result);
+            return await result;
+        }
+
+        async function addUser(exists) {
+            if (!exists) {
+                console.log("User does not exist, creating new user.");
+
+                const response = await fetch('http://localhost:8080/adduser', {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const result = await response.json();
+                console.log("Result of add:", result);
+            }
+            return;
+        }
+        
+
         async function loadWatchlist() {
             const response = await fetch('http://localhost:8080/getsymbols', {
                 method: 'GET',
@@ -79,7 +114,7 @@ export default function Dashboard() {
             })
             .catch((error) => console.error("Error loading watchlist:", error));
         }
-
+        checkUser();
         loadWatchlist();
     }, []);
 
@@ -125,8 +160,7 @@ export default function Dashboard() {
                         </h1>
                         <Button className='w-5 h-5 mr-[10px] bg-black' type='submit' size="icon"
                             onClick={() => {
-                                setSymbol(stock.toString());
-                                handleDeleteSymbol();
+                                handleDeleteSymbol(stock.toString());
                             }}
                         >
                             <MinusIcon className='text-white' />
