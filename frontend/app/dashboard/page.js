@@ -18,11 +18,15 @@ import { Label } from "@/components/ui/label"
 
 export default function Dashboard() {
 
+    // variables for user's stock watchlist
     const [watchlist, setWatchlist] = useState([]);
+    // variables for adding a stock symbol
     const [symbol, setSymbol] = useState("");
+    // variables for opening and closing the dialog
+    const [open, setOpen] = useState(false);
 
 
-    const handleAddSymbol = () => {
+    const handleAddSymbol = async () => {
         console.log("Adding symbol:", symbol);
         const response = fetch(`http://localhost:8080/add?symbol=${symbol}`, {
             method: 'POST',
@@ -39,9 +43,10 @@ export default function Dashboard() {
         })
         .catch((error) => console.error("Error adding symbol:", error));
         setSymbol("");
+        await loadWatchlist();
     };
 
-    const handleDeleteSymbol = (stockSymbol) => {
+    const handleDeleteSymbol = async (stockSymbol) => {
         console.log("Deleting symbol:", stockSymbol);
         const response = fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
             method: 'DELETE',
@@ -58,42 +63,62 @@ export default function Dashboard() {
         })
         .catch((error) => console.error("Error deleting symbol:", error));
         setSymbol("");
+        await loadWatchlist();
     }
 
-    useEffect(() => {
+    async function checkUser() {
+        const response = await fetch('http://localhost:8080/check', {
+            method: 'GET',
+            credentials: 'include',
+        })
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log("User exists:", result);
+        return await result;
+    }
 
-        // Check if user exists, returns true if user exists, false if not
-        async function checkUser() {
-            const response = await fetch('http://localhost:8080/check', {
-                method: 'GET',
+    async function addUser() {
+            console.log("User does not exist, creating new user.")
+            const response = await fetch('http://localhost:8080/adduser', {
+                method: 'POST',
                 credentials: 'include',
-            })
+            });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const result = await response.json();
-            console.log("User exists:", result);
-            return await result;
-        }
+            console.log("Result of add:", result);
+    }
 
-        async function addUser() {
-                console.log("User does not exist, creating new user.")
-                const response = await fetch('http://localhost:8080/adduser', {
-                    method: 'POST',
-                    credentials: 'include',
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const result = await response.json();
-                console.log("Result of add:", result);
-            
-        }
-        
+    async function loadWatchlist() {
+        console.log("Loading watchlist.");
+        const response = await fetch('http://localhost:8080/getsymbols', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            console.log("Watchlist data:", data);
+            setWatchlist(data); 
+        })
+        .catch((error) => console.error("Error loading watchlist:", error));
+    }
 
-        async function loadWatchlist() {
-            const response = await fetch('http://localhost:8080/getsymbols', {
-                method: 'GET',
+    useEffect(() => {
+        async function handleAddSymbol() {
+            console.log("Adding symbol:", symbol);
+            const response = fetch(`http://localhost:8080/add?symbol=${symbol}`, {
+                method: 'POST',
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
@@ -103,18 +128,42 @@ export default function Dashboard() {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                return response.json();
+                return response.text();
             })
-            .then((data) => {
-                console.log("Watchlist data:", data);
-                setWatchlist(data); 
+            .catch((error) => console.error("Error adding symbol:", error));
+            setSymbol("");
+            await loadWatchlist();
+        };
+    
+        async function handleDeleteSymbol (stockSymbol) {
+            console.log("Deleting symbol:", stockSymbol);
+            const response = fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             })
-            .catch((error) => console.error("Error loading watchlist:", error));
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .catch((error) => console.error("Error deleting symbol:", error));
+            setSymbol("");
+            await loadWatchlist();
         }
-        if(checkUser() == false) {
-            addUser();
+
+        async function initialize() {
+            const userExists = await checkUser();
+            if (!userExists) {
+                await addUser();
+            }
+            await loadWatchlist();
         }
-        loadWatchlist();
+        
+        initialize();
     }, []);
 
     return (
