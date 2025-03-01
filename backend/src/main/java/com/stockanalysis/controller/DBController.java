@@ -53,6 +53,7 @@ public class DBController {
 
     @RequestMapping("/getsymbols")
     public ArrayList<String> getSymbolsFromDB(HttpSession session) {
+        System.out.println("Fetching symbols from DB . . .");
         String google_id = session.getAttribute("USER_ID").toString();
         return dbService.getSymbols(google_id, this.stmt);
     }
