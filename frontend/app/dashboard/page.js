@@ -114,6 +114,25 @@ export default function Dashboard() {
         .catch((error) => console.error("Error loading watchlist:", error));
     }
 
+    const handleStockDataOpen = async (stockSymbol) => {
+        console.log("Retrieving stock data for:", stockSymbol);
+        const response = await fetch(`http://localhost:8080/getnews?symbol=${stockSymbol}`, {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response;
+        })
+        .then((data) => {
+            console.log("Stock data:", data);
+            // Handle the stock data here
+        })
+        
+    }
+
     useEffect(() => {
         async function handleAddSymbol() {
             console.log("Adding symbol:", symbol);
@@ -204,7 +223,7 @@ export default function Dashboard() {
                 {watchlist.map((stock, index) => (
                     <div key={index} className="flex items-center justify-between mb-1">
                         <h1 className="font-bold text-lg">
-                        <Button variant="ghost">{stock}</Button>
+                        <Button onClick={() => (handleStockDataOpen(stock))} variant="ghost">{stock}</Button>
                         </h1>
                         <Button className='w-5 h-5 mr-[10px] bg-black' type='submit' size="icon"
                             onClick={() => {

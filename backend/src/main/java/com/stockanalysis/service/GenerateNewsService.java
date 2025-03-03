@@ -43,6 +43,7 @@ public class GenerateNewsService {
             // Columns are: Article Title (0), Publisher (1), Link (2)
             for (int i = 0; i < 5; i++) {
                 JSONObject newsItem = newsArray.getJSONObject(i);
+                System.out.println("Current: "+ newsItem);
                 newsInfo[0][i] = newsItem.getString("title");
                 newsInfo[1][i] = newsItem.getString("publisher");
                 newsInfo[2][i] = newsItem.getString("link");
