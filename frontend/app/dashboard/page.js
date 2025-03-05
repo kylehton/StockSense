@@ -22,8 +22,11 @@ export default function Dashboard() {
     const [watchlist, setWatchlist] = useState([]);
     // variables for adding a stock symbol
     const [symbol, setSymbol] = useState("");
-    // variables for opening and closing the dialog
+    // variables for dialog box
     const [open, setOpen] = useState(false);
+    // variables for stock news data
+    const [newsItems, setNewsItems] = useState([]);
+    const [selectedStock, setSelectedStock] = useState("");
 
 
     const handleAddSymbol = async () => {
@@ -44,6 +47,7 @@ export default function Dashboard() {
         .catch((error) => console.error("Error adding symbol:", error));
         setSymbol("");
         await loadWatchlist();
+        setOpen(false);
     };
 
     const handleDeleteSymbol = async (stockSymbol) => {
@@ -116,64 +120,34 @@ export default function Dashboard() {
 
     const handleStockDataOpen = async (stockSymbol) => {
         console.log("Retrieving stock data for:", stockSymbol);
+        setSelectedStock(stockSymbol); // Set the selected stock
         const response = await fetch(`http://localhost:8080/getnews?symbol=${stockSymbol}`, {
             method: 'GET',
             credentials: 'include'
         })
-        .then((response) => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response;
-        })
-        .then((data) => {
-            console.log("Stock data:", data);
-            // Handle the stock data here
-        })
-        
-    }
+            const newsText = await response.text();
 
-    useEffect(() => {
-        async function handleAddSymbol() {
-            console.log("Adding symbol:", symbol);
-            const response = fetch(`http://localhost:8080/add?symbol=${symbol}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
+            const splitNews = JSON.parse(newsText);
+            console.log("News data:", splitNews);
+
+            const storeItems = [];
+            const numItems = splitNews[0].length;
+            for (let i = 0; i < numItems; i++) {
+                const newItem = {
+                    title: splitNews[0][i],
+                    publisher: splitNews[1][i],
+                    url: splitNews[2][i]
                 }
-            })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .catch((error) => console.error("Error adding symbol:", error));
-            setSymbol("");
-            await loadWatchlist();
-        };
-    
-        async function handleDeleteSymbol (stockSymbol) {
-            console.log("Deleting symbol:", stockSymbol);
-            const response = fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
-                method: 'DELETE',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .catch((error) => console.error("Error deleting symbol:", error));
-            setSymbol("");
-            await loadWatchlist();
+                console.log("New item #", i+1, ":", newItem);
+                storeItems.push(newItem);
+            }
+            setNewsItems(storeItems);
         }
 
+    useEffect(() => {
         async function initialize() {
             const userExists = await checkUser();
             if (!userExists) {
@@ -190,7 +164,7 @@ export default function Dashboard() {
             <div id="watchlist-wrapper" className="rounded-lg ml-16 h-4/5 w-1/4 bg-white flex flex-col p-4">
                 <div id="watchlist-header" className="flex items-center justify-between mb-4">
                     <h1 className="font-bold text-xl">Watchlist</h1> 
-                        <Dialog>
+                        <Dialog open={open} onOpenChange={setOpen}>
                             <DialogTrigger asChild>
                                 <Button type="submit" className="ml-auto px-4">
                                     <span className='mb-[2px]'>+</span>
@@ -237,8 +211,28 @@ export default function Dashboard() {
                 ))}
                 </div>
             </div>
-            <div id="stock-data-wrapper" className="rounded-lg mr-16 h-[90%] w-[50%] bg-white flex items-center justify-center">
-                <h1 className='text-2xl'>Select a symbol from your watchlist.</h1>
+            <div id="stock-data-wrapper" className="rounded-lg mr-16 h-[90%] w-[50%] bg-white flex flex-col items-start justify-start p-6 overflow-y-auto">
+            {selectedStock ? (
+                <>
+                    <h1 className="text-2xl font-bold mb-6">{selectedStock} News</h1>
+                    <div className="w-full">
+                        {newsItems.map((item, index) => (
+                            <div key={index} className="mb-4 p-4 border rounded-lg hover:bg-gray-50">
+                                <h2 className="text-lg font-semibold mb-1">{item.title}</h2>
+                                <p className="text-sm text-gray-600 mb-2">Source: {item.publisher}</p>
+                                <a href={item.url} target="_blank" rel="noopener noreferrer" 
+                                className="text-blue-600 hover:underline text-sm">
+                                    Read more
+                                </a>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            ) : (
+                <div className="h-full w-full flex items-center justify-center">
+                    <h1 className="text-2xl text-gray-500">Select a symbol from your watchlist.</h1>
+                </div>
+            )}
             </div>
         </div>
     );

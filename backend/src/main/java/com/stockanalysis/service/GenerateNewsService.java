@@ -16,12 +16,10 @@ import org.json.JSONObject;
 public class GenerateNewsService {
 
     
-    public String[][] generateNews(String stockSymbol, String userid) {
-
-        System.out.println("User ID: " + userid);
+    public String[][] generateNews(String stockSymbol) {
 
         String[][] newsInfo = new String[3][5];
-        // Placeholder for news generation
+        // Yahoo Finance API URL
         String apiCallURL = "https://query1.finance.yahoo.com/v1/finance/search?q=" + stockSymbol;
 
         HttpClient client = HttpClient.newHttpClient();
@@ -32,7 +30,6 @@ public class GenerateNewsService {
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            
             JSONObject jsonResponse = new JSONObject(response.body());
 
         // Extract the "news" array
@@ -43,16 +40,16 @@ public class GenerateNewsService {
             // Columns are: Article Title (0), Publisher (1), Link (2)
             for (int i = 0; i < 5; i++) {
                 JSONObject newsItem = newsArray.getJSONObject(i);
-                System.out.println("Current: "+ newsItem);
                 newsInfo[0][i] = newsItem.getString("title");
                 newsInfo[1][i] = newsItem.getString("publisher");
                 newsInfo[2][i] = newsItem.getString("link");
 
             }
-            System.out.println("News generated for user: " + userid);
-            System.out.println(newsInfo[0][0]);
-            System.out.println(newsInfo[1][0]);
-            System.out.println(newsInfo[2][0]);
+            for (int x = 0; x < 5; x++) {
+                System.out.println("Title: " + newsInfo[0][x]);
+                System.out.println("Publisher: " + newsInfo[1][x]);
+                System.out.println("Link: " + newsInfo[2][x]);
+            }
             return newsInfo;
         } catch (Exception e) {
             e.printStackTrace();
