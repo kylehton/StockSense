@@ -28,7 +28,7 @@ export default function Dashboard() {
 
     const handleAddSymbol = async () => {
         console.log("Adding symbol:", symbol);
-        const response = fetch(`http://localhost:8080/add?symbol=${symbol}`, {
+        const response = await fetch(`http://localhost:8080/add?symbol=${symbol}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -48,7 +48,7 @@ export default function Dashboard() {
 
     const handleDeleteSymbol = async (stockSymbol) => {
         console.log("Deleting symbol:", stockSymbol);
-        const response = fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
+        const response = await fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
             method: 'DELETE',
             credentials: 'include',
             headers: {
