@@ -2,8 +2,6 @@ package com.stockanalysis.service;
 
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpSession;
-
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
