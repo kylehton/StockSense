@@ -13,13 +13,12 @@ public class ScraperController {
     private final ScraperService scraperService;
 
     @Autowired
-    public ScraperController( ScraperService scraperService) {
+    public ScraperController(ScraperService scraperService) {
         this.scraperService = scraperService;
     }
 
     @PostMapping("/scrape")
     public String scrapeWebsite(@RequestParam String url) {
-        String completedText = scraperService.scrape(url);
-        return completedText;
+        return scraperService.scrape(url);
     }
 }
