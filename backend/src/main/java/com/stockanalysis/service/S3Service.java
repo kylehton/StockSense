@@ -9,8 +9,12 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,48 +24,59 @@ public class S3Service {
 
     private final S3Client s3Client;
     private String bucketName;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public S3Service(AWSConfig awsConfig) {
         // Load environment variables using dotenv if not already set
         this.s3Client = awsConfig.buildS3Client();
         this.bucketName = awsConfig.getBucketName();
+        this.objectMapper = new ObjectMapper();
     }
 
-    public void uploadScrapedData(String key, Object data) {
+    public String uploadAVNewsData(String stockSymbol, String[][] newsArray) {
         try {
-            // Convert object to JSON string
+            // Generate a unique key for the S3 object using UUID
+            String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+            String s3Key = "stock_news/" + stockSymbol + "/" + uniqueId + ".json";
+            
+            // Convert the 2D array to a JSON string
             ObjectMapper objectMapper = new ObjectMapper();
-            String jsonData = objectMapper.writeValueAsString(data);
-
+            String jsonPayload = objectMapper.writeValueAsString(newsArray);
+            
             // Upload JSON to S3
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(key)
-                    .contentType("text/plain")
+                    .key(s3Key)
+                    .contentType("application/json")
                     .build();
-
-            s3Client.putObject(putObjectRequest, RequestBody.fromString(jsonData, StandardCharsets.UTF_8));
-
-            System.out.println("Successfully uploaded to S3: " + bucketName + "/" + key);
-        } catch (IOException e) {
-            System.err.println("Error converting data to JSON: " + e.getMessage());
+    
+            s3Client.putObject(putObjectRequest, RequestBody.fromString(jsonPayload, StandardCharsets.UTF_8));
+    
+            System.out.println("Successfully uploaded news data to S3: " + bucketName + "/" + s3Key);
+            return uniqueId;
         } catch (Exception e) {
-            System.err.println("Error uploading to S3: " + e.getMessage());
+            System.err.println("Error uploading news data to S3: " + e.getMessage());
+            throw new RuntimeException("Failed to upload news data to S3", e);
         }
     }
+    
 
-    public String readObjectContent(String objectKey) {
-        String fullObjectKey = "scraped_data/" + objectKey + ".txt";
+    public String[][] readNewsObjectContent(String objectKey) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
-                .key(fullObjectKey)
+                .key(objectKey)
                 .build();
-
+    
         try (ResponseInputStream<GetObjectResponse> response = s3Client.getObject(getObjectRequest)) {
-            return new String(response.readAllBytes());
+            // Read the content as a string
+            String jsonContent = new String(response.readAllBytes());
+            
+            // Parse the JSON string back to a 2D array
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(jsonContent, String[][].class);
         } catch (Exception e) {
-            throw new RuntimeException("Error reading object from S3", e);
+            throw new RuntimeException("Error reading news data from S3: " + e.getMessage(), e);
         }
     }
 }

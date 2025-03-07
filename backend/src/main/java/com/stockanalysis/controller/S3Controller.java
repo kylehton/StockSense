@@ -2,6 +2,8 @@ package com.stockanalysis.controller;
 
 import java.util.Date;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,18 +25,8 @@ public class S3Controller {
     // scraping for easier passthrough of data parameters to S3 bucket
 
     @RequestMapping("/s3/retrieve")
-    public String retrieveFromS3(@RequestParam String id, HttpSession session) {
-        try{
-        System.out.println("all session attributes: " + session.getAttributeNames());
-        System.out.println("Current Session ID: " + session.getId());
-        System.out.println("Session Creation Time: " + new Date(session.getCreationTime()));
-        System.out.println("Session Last Accessed Time: " + new Date(session.getLastAccessedTime()));
-        System.out.println("Is Session New: " + session.isNew());
-        return s3Service.readObjectContent(id);
-        }
-        catch(Exception e){
-          return "Error retrieving from S3: " + e.getMessage();
-        }
+    public String[][] retrieveFromS3(@RequestParam String id, HttpSession session) {
+        return s3Service.readNewsObjectContent(id);
     }
 
 }
