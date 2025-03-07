@@ -121,9 +121,12 @@ export default function Dashboard() {
     const handleStockDataOpen = async (stockSymbol) => {
         console.log("Retrieving stock data for:", stockSymbol);
         setSelectedStock(stockSymbol); // Set the selected stock
-        const response = await fetch(`http://localhost:8080/getnews?symbol=${stockSymbol}`, {
-            method: 'GET',
-            credentials: 'include'
+        const response = await fetch(`http://localhost:8080/generatenews?symbol=${stockSymbol}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            }
         })
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);

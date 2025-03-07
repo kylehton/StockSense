@@ -6,20 +6,23 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 @Service
 public class GenerateNewsService {
-
     
     public String[][] generateNews(String stockSymbol) {
 
-        String[][] newsInfo = new String[3][5];
-        // Yahoo Finance API URL
-        String apiCallURL = "https://query1.finance.yahoo.com/v1/finance/search?q=" + stockSymbol;
+        Dotenv dotenv = Dotenv.load();
 
+        String[][] newsInfo = new String[4][5];
+        String api_key = dotenv.get("AV_API_KEY");
+        // Yahoo Finance API URL
+        String apiCallURL = "https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=" + stockSymbol + "&apikey=" + api_key;
+                        
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(apiCallURL))
@@ -29,9 +32,10 @@ public class GenerateNewsService {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             JSONObject jsonResponse = new JSONObject(response.body());
+            System.out.println(jsonResponse);
 
         // Extract the "news" array
-            JSONArray newsArray = jsonResponse.getJSONArray("news");
+            JSONArray newsArray = jsonResponse.getJSONArray("feed");
 
             // Loop through the news items and print title, publisher, and link
             // Store the first 5 items in newsInfo
@@ -39,14 +43,16 @@ public class GenerateNewsService {
             for (int i = 0; i < 5; i++) {
                 JSONObject newsItem = newsArray.getJSONObject(i);
                 newsInfo[0][i] = newsItem.getString("title");
-                newsInfo[1][i] = newsItem.getString("publisher");
-                newsInfo[2][i] = newsItem.getString("link");
+                newsInfo[1][i] = newsItem.getString("source");
+                newsInfo[2][i] = newsItem.getString("url");
+                newsInfo[3][i] = String.valueOf(newsItem.getDouble("overall_sentiment_score"));
 
             }
             for (int x = 0; x < 5; x++) {
                 System.out.println("Title: " + newsInfo[0][x]);
-                System.out.println("Publisher: " + newsInfo[1][x]);
+                System.out.println("Source: " + newsInfo[1][x]);
                 System.out.println("Link: " + newsInfo[2][x]);
+                System.out.println("Sentiment Score: " + newsInfo[3][x]);
             }
             return newsInfo;
         } catch (Exception e) {
