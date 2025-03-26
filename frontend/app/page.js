@@ -1,6 +1,7 @@
-import  SignInModal from "./components/SignInModal";
+import SignInModal from "./customcomponents/SignInModal";
 
 export default function Home() {
+
   return (
     <div id="page-wrapper" className="flex h-screen w-full">
       <div className="flex flex-col items-center">

@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -22,11 +23,13 @@ public class GoogleSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)) 
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)) 
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll());
+                .requestMatchers("/csrf", "/google/auth", "GET").permitAll()
+                .anyRequest().authenticated());
 
         return http.build();
     }
@@ -37,9 +40,9 @@ public class GoogleSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000, http://localhost:3000/dashboard"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "X-XSRF-TOKEN"));
+        configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "CSRF-TOKEN", "XSRF-TOKEN", "X-XSRF-TOKEN", "X-CSRF-TOKEN"));
         configuration.setAllowCredentials(true); 
-        configuration.setExposedHeaders(List.of("Set-Cookie")); 
+        configuration.setExposedHeaders(List.of("Set-Cookie"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
