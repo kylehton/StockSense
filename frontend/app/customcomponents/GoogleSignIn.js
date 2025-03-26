@@ -8,9 +8,7 @@ const GoogleSignIn = () => {
     const clientID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const router = useRouter();
 
-    // unable to read from .env file, so manually insert the clientID when using localhost, and 
-    // revert back to this when pushing onto main branch for deployment
-  
+    
     useEffect(() => {
       const initGoogleSignIn = () => {
         if (window.google) {
@@ -30,6 +28,7 @@ const GoogleSignIn = () => {
           );
         }
       };
+
   
       // Load the Google Sign-In script and initialize Google Sign-In
       const script = document.createElement('script');
@@ -44,17 +43,33 @@ const GoogleSignIn = () => {
         document.body.removeChild(script);
       };
     }, [clientID]);
+
+    async function getCSRFToken() {
+      const csrfToken = await fetch('http://localhost:8080/csrf', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+              'Content-Type': 'application/json',
+          }
+      })
+      const data = await csrfToken.json();
+      return data; // return CSRF token value
+  }
   
     const handleCredentialResponse = async (response) => {
+      const csrfToken = await getCSRFToken();
       if (response.credential) {
         //response.credential is the JWT token for the authenticated user
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
         console.log("Creds:",response.credential);
+        console.log("CSRF:",csrfToken);
+        console.log("CSRF Token:", csrfToken['token']);
 
         const res = await fetch(`http://localhost:8080/google/auth?id=${response.credential}`, {
           method: "POST",
           credentials: "include", 
           headers: {
+              "X-XSRF-TOKEN": csrfToken['token'],
               "Content-Type": "application/json",
           },
         });
