@@ -28,89 +28,132 @@ export default function Dashboard() {
     const [newsItems, setNewsItems] = useState([]);
     const [selectedStock, setSelectedStock] = useState("");
 
-    const getXSRFToken = async () => {
-        const xsrfToken = await fetch('http://localhost:8080/xsrf', {
-            method: 'GET',
-            credentials: 'include',
-        })
-        const data = await xsrfToken.json();
-        return data.token; // return XSRF token value
-    }
+    async function getXSRFToken() {
+        try {
+            const response = await fetch('http://localhost:8080/xsrf', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch XSRF token: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log("XSRF token fetched successfully");
+            return data.token;
+        } catch (error) {
+            console.error("Error fetching XSRF token:", error);
+            throw error;
+        }
+      }
 
 
     const handleAddSymbol = async () => {
-        console.log("Adding symbol:", symbol);
+        try {
+            console.log("Adding symbol:", symbol);
+            const xsrfToken = await getXSRFToken();
 
-        const xsrfToken = await getXSRFToken();
+            const response = await fetch(`http://localhost:8080/add?symbol=${symbol}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-XSRF-TOKEN': xsrfToken,
+                    'Content-Type': 'application/json',
+                }
+            });
 
-        const response = await fetch(`http://localhost:8080/add?symbol=${symbol}`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'X-XSRF-Token': xsrfToken['token'],
-                'Content-Type': 'application/json',
-            }
-        })
-        .then((response) => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response.text();
-        })
-        .catch((error) => console.error("Error adding symbol:", error));
-        setSymbol("");
-        await loadWatchlist();
-        setOpen(false);
+
+            const result = await response.text();
+            console.log("Add symbol result:", result);
+            
+            setSymbol("");
+            await loadWatchlist();
+            setOpen(false);
+        } catch (error) {
+            console.error("Error adding symbol:", error);
+        }
     };
 
     const handleDeleteSymbol = async (stockSymbol) => {
-        const xsrfToken = await getXSRFToken();
-        console.log("Deleting symbol:", stockSymbol);
-        const response = await fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
-            method: 'DELETE',
-            credentials: 'include',
-            headers: {
-                'X-XSRF-Token': xsrfToken['token'],
-                'Content-Type': 'application/json',
-            }
-        })
-        .then((response) => {
+        try {
+            const xsrfToken = await getXSRFToken();
+            console.log("Deleting symbol:", stockSymbol);
+            
+            const response = await fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                    'X-XSRF-TOKEN': xsrfToken,
+                    'Content-Type': 'application/json',
+                }
+            });
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response.text();
-        })
-        .catch((error) => console.error("Error deleting symbol:", error));
-        setSymbol("");
-        await loadWatchlist();
+
+            const result = await response.text();
+            console.log("Delete symbol result:", result);
+            await loadWatchlist();
+        } catch (error) {
+            console.error("Error deleting symbol:", error);
+        }
     }
 
     async function checkUser() {
-        //const xsrfToken = await getXSRFToken();
-        const response = await fetch('http://localhost:8080/check', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                //'X-XSRF-Token': xsrfToken['token'],
-                'Content-Type': 'application/json',
+        try {
+            // Get fresh CSRF token first
+            const csrfResponse = await fetch('http://localhost:8080/xsrf', {
+                method: 'GET',
+                credentials: 'include',
+            });
+            
+            if (!csrfResponse.ok) {
+                console.error('Failed to get CSRF token');
+                return false;
             }
-        })
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            
+            const { token: csrfToken } = await csrfResponse.json();
+            
+            // Make the check request with the CSRF token
+            const response = await fetch('http://localhost:8080/check', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': csrfToken
+                }
+            });
+
+            if (!response.ok) {
+                console.error('Check user request failed:', response.status);
+                return false;
+            }
+
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Error checking user:', error);
+            return false;
         }
-        const result = await response.json();
-        console.log("User exists:", result);
-        return await result;
     }
 
     async function addUser() {
-            //const xsrfToken = await getXSRFToken();
+        try {
+            const xsrfToken = await getXSRFToken();
             console.log("User does not exist, creating new user.")
             const response = await fetch('http://localhost:8080/adduser', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    //'X-XSRF-Token': xsrfToken['token'],
+                    'X-XSRF-TOKEN': xsrfToken,
                     'Content-Type': 'application/json',
                 }
             });
@@ -119,47 +162,55 @@ export default function Dashboard() {
             }
             const result = await response.json();
             console.log("Result of add:", result);
+        } catch (error) {
+            console.error("Error adding user:", error);
+            throw error;
+        }
     }
 
     async function loadWatchlist() {
-        //const xsrfToken = await getXSRFToken();
-        console.log("Loading watchlist.");
-        const response = await fetch('http://localhost:8080/getsymbols', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                //'X-XSRF-TOKEN': xsrfToken['token'],
-                'Content-Type': 'application/json',
-            }
-        })
-        .then((response) => {
+        try {
+            const xsrfToken = await getXSRFToken();
+            console.log("Loading watchlist.");
+            const response = await fetch('http://localhost:8080/getsymbols', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'X-XSRF-TOKEN': xsrfToken,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            return response.json();
-        })
-        .then((data) => {
+            
+            const data = await response.json();
             console.log("Watchlist data:", data);
-            setWatchlist(data); 
-        })
-        .catch((error) => console.error("Error loading watchlist:", error));
+            setWatchlist(data);
+        } catch (error) {
+            console.error("Error loading watchlist:", error);
+        }
     }
 
     const handleStockDataOpen = async (stockSymbol) => {
-        const xsrfToken = await getXSRFToken();
-        console.log("Retrieving stock data for:", stockSymbol);
-        setSelectedStock(stockSymbol); // Set the selected stock
-        const response = await fetch(`http://localhost:8080/generatenews?symbol=${stockSymbol}`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'X-FSRF-Token': xsrfToken['token'],
-                'Content-Type': 'application/json',
-            }
-        })
+        try {
+            const xsrfToken = await getXSRFToken();
+            console.log("Retrieving stock data for:", stockSymbol);
+            setSelectedStock(stockSymbol); // Set the selected stock
+            const response = await fetch(`http://localhost:8080/generatenews?symbol=${stockSymbol}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-XSRF-TOKEN': xsrfToken,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
+            
             const newsText = await response.text();
 
             const splitNews = JSON.parse(newsText);
@@ -178,6 +229,10 @@ export default function Dashboard() {
             }
             setNewsItems(storeItems);
         }
+        catch {
+            console.error("Error retrieving stock data:", error);
+        }
+    }
 
     useEffect(() => {
         async function initialize() {

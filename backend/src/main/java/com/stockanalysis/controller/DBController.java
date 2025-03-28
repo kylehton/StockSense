@@ -4,6 +4,10 @@ import com.stockanalysis.config.DataBaseConfig;
 import jakarta.servlet.http.HttpSession;
 
 import com.stockanalysis.service.DBService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.lang.reflect.Array;
 import java.sql.Connection;
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class DBController {
+    private static final Logger logger = LoggerFactory.getLogger(DBController.class);
 
     Statement stmt;
     Connection conn;
@@ -53,16 +58,52 @@ public class DBController {
 
     @RequestMapping("/getsymbols")
     public ArrayList<String> getSymbolsFromDB(HttpSession session) {
-        System.out.println("Fetching symbols from DB . . .");
-        String google_id = session.getAttribute("USER_ID").toString();
-        return dbService.getSymbols(google_id, this.stmt);
+        try {
+            System.out.println("Fetching symbols from DB . . .");
+            Object userId = session.getAttribute("USER_ID");
+            if (userId == null) {
+                System.out.println("No user session found for getSymbols");
+                return new ArrayList<>();
+            }
+            String google_id = userId.toString();
+            return dbService.getSymbols(google_id, this.stmt);
+        } catch (Exception e) {
+            System.out.println("Error fetching symbols: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     @GetMapping("/check")
-    public Boolean checkUser(HttpSession session) {
-        String google_id = session.getAttribute("USER_ID").toString();
-        System.out.println("User Check Results: "+dbService.checkUserExists(google_id, this.stmt));
-        return dbService.checkUserExists(google_id, this.stmt);
+    public ResponseEntity<?> checkUser(HttpSession session) {
+        logger.debug("Check endpoint called. Session ID: {}", 
+            session != null ? session.getId() : "null");
+
+        try {
+            // Check if there's an active session
+            if (session == null) {
+                logger.debug("No session found");
+                return ResponseEntity.ok(false);
+            }
+
+            // Get user ID from session
+            Object userId = session.getAttribute("USER_ID");
+            logger.debug("USER_ID from session: {}", userId);
+
+            if (userId == null) {
+                logger.debug("No USER_ID in session");
+                return ResponseEntity.ok(false);
+            }
+
+            // Check if user exists in database
+            boolean exists = dbService.checkUserExists(userId.toString(), stmt);
+            logger.debug("User exists in DB: {}", exists);
+
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            logger.error("Error checking user: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error checking user: " + e.getMessage());
+        }
     }
 
     @PostMapping("/adduser")

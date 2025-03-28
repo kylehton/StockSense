@@ -52,18 +52,40 @@ const GoogleSignIn = () => {
     }, [clientID]);
 
     
+    /**
+     * Retrieves CSRF token to protect against Cross-Site Request Forgery attacks.
+     * 
+     * The flow works as follows:
+     * 1. A request to /xsrf endpoint returns the CSRF token in the response body
+     * 2. This token is included in subsequent requests as the X-XSRF-TOKEN header
+     * 3. Spring Security validates that the X-XSRF-TOKEN header matches the expected token
+     * 
+     * @returns {string} The CSRF token value from the response body
+     */
     async function getXSRFToken() {
       try {
-          const xsrfToken = await fetch('http://localhost:8080/xsrf', {
+          // Make a fetch call to get the CSRF token from the response body
+          const response = await fetch('http://localhost:8080/xsrf', {
               method: 'GET',
               credentials: 'include',
               headers: {
                   'Content-Type': 'application/json',
               }
           });
-          //document.cookie = `XSRF-TOKEN=${xsrfToken.headers.get('x-xsrf-token')}; path=/`; // Store it in cookies
           
-          return xsrfToken.headers.get('x-xsrf-token');
+          if (!response.ok) {
+              throw new Error(`Failed to fetch XSRF token: ${response.status} ${response.statusText}`);
+          }
+          
+          // Parse the response to get the token from the response body
+          const data = await response.json();
+          
+          if (!data || !data.token) {
+              throw new Error('XSRF token not found in response body');
+          }
+          
+          console.debug("XSRF token from response:", data.token);
+          return data.token;
       } catch (error) {
           console.error("Error fetching XSRF token:", error);
           throw error;
@@ -82,21 +104,29 @@ const GoogleSignIn = () => {
       return response.text();
     }
   
+    /**
+     * Handles the Google Sign-In credential response
+     * Sends the credential to the backend for validation and authentication
+     */
     const handleCredentialResponse = async (response) => {
       if (response.credential) {
-        const xsrf = await getXSRFToken();
+        // Get CSRF token from the server
+        const csrfToken = await getXSRFToken();
+        
         //response.credential is the JWT token for the authenticated user
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
         console.log("Creds:",response.credential);
-        console.log("XSRF from backend:", xsrf);
         console.log("Session ID:", getCookie("JSESSIONID"))
         console.log("Session ID from backend:", await getSessionID());
+
+        // Debug logging of the token being sent
+        console.debug("Sending CSRF token in X-XSRF-TOKEN header:", csrfToken);
 
         const res = await fetch(`http://localhost:8080/google/auth?id=${response.credential}`, {
           method: "POST",
           credentials: "include", 
           headers: {
-              "X-Xsrf-Token": `${xsrf}`,
+              "X-XSRF-TOKEN": csrfToken,
               "Content-Type": "application/json",
           },
         })
