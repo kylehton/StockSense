@@ -8,6 +8,13 @@ const GoogleSignIn = () => {
     const clientID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const router = useRouter();
 
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) 
+        return parts.pop().split(';').shift();
+    }
+
     
     useEffect(() => {
       const initGoogleSignIn = () => {
@@ -44,35 +51,55 @@ const GoogleSignIn = () => {
       };
     }, [clientID]);
 
-    async function getCSRFToken() {
-      const csrfToken = await fetch('http://localhost:8080/csrf', {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-              'Content-Type': 'application/json',
-          }
+    
+    async function getXSRFToken() {
+      try {
+          const xsrfToken = await fetch('http://localhost:8080/xsrf', {
+              method: 'GET',
+              credentials: 'include',
+              headers: {
+                  'Content-Type': 'application/json',
+              }
+          });
+          //document.cookie = `XSRF-TOKEN=${xsrfToken.headers.get('x-xsrf-token')}; path=/`; // Store it in cookies
+          
+          return xsrfToken.headers.get('x-xsrf-token');
+      } catch (error) {
+          console.error("Error fetching XSRF token:", error);
+          throw error;
+      }
+    }
+    
+    async function getSessionID() {
+      const response = await fetch("http://localhost:8080/getsession", 
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        }
       })
-      const data = await csrfToken.json();
-      return data; // return CSRF token value
-  }
+      return response.text();
+    }
   
     const handleCredentialResponse = async (response) => {
-      const csrfToken = await getCSRFToken();
       if (response.credential) {
+        const xsrf = await getXSRFToken();
         //response.credential is the JWT token for the authenticated user
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
         console.log("Creds:",response.credential);
-        console.log("CSRF:",csrfToken);
-        console.log("CSRF Token:", csrfToken['token']);
+        console.log("XSRF from backend:", xsrf);
+        console.log("Session ID:", getCookie("JSESSIONID"))
+        console.log("Session ID from backend:", await getSessionID());
 
         const res = await fetch(`http://localhost:8080/google/auth?id=${response.credential}`, {
           method: "POST",
           credentials: "include", 
           headers: {
-              "X-XSRF-TOKEN": csrfToken['token'],
+              "X-Xsrf-Token": `${xsrf}`,
               "Content-Type": "application/json",
           },
-        });
+        })
         if (res.ok) {
           console.log(res.text());
           router.push('/dashboard');
