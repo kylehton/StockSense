@@ -8,14 +8,6 @@ const GoogleSignIn = () => {
     const clientID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const router = useRouter();
 
-    function getCookie(name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) 
-        return parts.pop().split(';').shift();
-    }
-
-    
     useEffect(() => {
       const initGoogleSignIn = () => {
         if (window.google) {
@@ -35,7 +27,6 @@ const GoogleSignIn = () => {
           );
         }
       };
-
   
       // Load the Google Sign-In script and initialize Google Sign-In
       const script = document.createElement('script');
@@ -49,8 +40,8 @@ const GoogleSignIn = () => {
       return () => {
         document.body.removeChild(script);
       };
-    }, [clientID]);
 
+    }, [clientID]);
     
     /**
      * Retrieves CSRF token to protect against Cross-Site Request Forgery attacks.
@@ -60,7 +51,6 @@ const GoogleSignIn = () => {
      * 2. This token is included in subsequent requests as the X-XSRF-TOKEN header
      * 3. Spring Security validates that the X-XSRF-TOKEN header matches the expected token
      * 
-     * @returns {string} The CSRF token value from the response body
      */
     async function getXSRFToken() {
       try {
@@ -91,18 +81,6 @@ const GoogleSignIn = () => {
           throw error;
       }
     }
-    
-    async function getSessionID() {
-      const response = await fetch("http://localhost:8080/getsession", 
-      {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        }
-      })
-      return response.text();
-    }
   
     /**
      * Handles the Google Sign-In credential response
@@ -116,8 +94,6 @@ const GoogleSignIn = () => {
         //response.credential is the JWT token for the authenticated user
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
         console.log("Creds:",response.credential);
-        console.log("Session ID:", getCookie("JSESSIONID"))
-        console.log("Session ID from backend:", await getSessionID());
 
         // Debug logging of the token being sent
         console.debug("Sending CSRF token in X-XSRF-TOKEN header:", csrfToken);

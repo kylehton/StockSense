@@ -70,8 +70,11 @@ public class GoogleSecurityConfig {
             // Basic setup
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
+                // Enable CSRF protection with a custom token repository, readable by JavaScript
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+
+                // Custom CSRF matcher to exclude certain paths from CSRF protection
                 .requireCsrfProtectionMatcher(request -> 
                     !"OPTIONS".equals(request.getMethod()) && 
                     !"/xsrf".equals(request.getServletPath()) &&
@@ -85,6 +88,7 @@ public class GoogleSecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
+                // '/xsrf' endpoint called upon expiring of session to re-instantiate a new session
                 .expiredUrl("/xsrf")
             )
             

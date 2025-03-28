@@ -5,10 +5,12 @@ import com.stockanalysis.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/news")
 public class GenerateNewsController {
     
     private final GenerateNewsService generateNewsService;
@@ -21,7 +23,7 @@ public class GenerateNewsController {
         
     }
 
-    @PostMapping("/generatenews")
+    @PostMapping("/generate")
     public String[][] generateNews(@RequestParam String symbol) {
         // generates news, places it into S3 bucket, then returns its respective S3 key
         String[][] news = generateNewsService.generateNews(symbol);
@@ -31,7 +33,7 @@ public class GenerateNewsController {
         return news;
     }
 
-    @GetMapping("/getnews")
+    @GetMapping("/get")
     public String[][] getNews(@RequestParam String key) {
         // retrieves news from S3 bucket using the S3 key
         return s3Service.readNewsObjectContent(key);
