@@ -28,26 +28,26 @@ export default function Dashboard() {
     const [newsItems, setNewsItems] = useState([]);
     const [selectedStock, setSelectedStock] = useState("");
 
-    const getCSRFToken = async () => {
-        const csrfToken = await fetch('http://localhost:8080/csrf', {
+    const getXSRFToken = async () => {
+        const xsrfToken = await fetch('http://localhost:8080/xsrf', {
             method: 'GET',
             credentials: 'include',
         })
-        const data = await csrfToken.json();
-        return data.token; // return CSRF token value
+        const data = await xsrfToken.json();
+        return data.token; // return XSRF token value
     }
 
 
     const handleAddSymbol = async () => {
         console.log("Adding symbol:", symbol);
 
-        const csrfToken = await getCSRFToken();
+        const xsrfToken = await getXSRFToken();
 
         const response = await fetch(`http://localhost:8080/add?symbol=${symbol}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
-                'X-CSRF-Token': csrfToken,
+                'X-XSRF-Token': xsrfToken['token'],
                 'Content-Type': 'application/json',
             }
         })
@@ -64,13 +64,13 @@ export default function Dashboard() {
     };
 
     const handleDeleteSymbol = async (stockSymbol) => {
-        const csrfToken = await getCSRFToken();
+        const xsrfToken = await getXSRFToken();
         console.log("Deleting symbol:", stockSymbol);
         const response = await fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
             method: 'DELETE',
             credentials: 'include',
             headers: {
-                'X-CSRF-Token': csrfToken,
+                'X-XSRF-Token': xsrfToken['token'],
                 'Content-Type': 'application/json',
             }
         })
@@ -86,12 +86,12 @@ export default function Dashboard() {
     }
 
     async function checkUser() {
-        const csrfToken = await getCSRFToken();
+        //const xsrfToken = await getXSRFToken();
         const response = await fetch('http://localhost:8080/check', {
             method: 'GET',
             credentials: 'include',
             headers: {
-                'X-CSRF-Token': csrfToken,
+                //'X-XSRF-Token': xsrfToken['token'],
                 'Content-Type': 'application/json',
             }
         })
@@ -104,13 +104,13 @@ export default function Dashboard() {
     }
 
     async function addUser() {
-            const csrfToken = await getCSRFToken();
+            //const xsrfToken = await getXSRFToken();
             console.log("User does not exist, creating new user.")
             const response = await fetch('http://localhost:8080/adduser', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    'X-CSRF-Token': csrfToken,
+                    //'X-XSRF-Token': xsrfToken['token'],
                     'Content-Type': 'application/json',
                 }
             });
@@ -122,11 +122,13 @@ export default function Dashboard() {
     }
 
     async function loadWatchlist() {
+        //const xsrfToken = await getXSRFToken();
         console.log("Loading watchlist.");
         const response = await fetch('http://localhost:8080/getsymbols', {
             method: 'GET',
             credentials: 'include',
             headers: {
+                //'X-XSRF-TOKEN': xsrfToken['token'],
                 'Content-Type': 'application/json',
             }
         })
@@ -144,14 +146,14 @@ export default function Dashboard() {
     }
 
     const handleStockDataOpen = async (stockSymbol) => {
-        const csrfToken = await getCSRFToken();
+        const xsrfToken = await getXSRFToken();
         console.log("Retrieving stock data for:", stockSymbol);
         setSelectedStock(stockSymbol); // Set the selected stock
         const response = await fetch(`http://localhost:8080/generatenews?symbol=${stockSymbol}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
-                'X-CSRF-Token': csrfToken,
+                'X-FSRF-Token': xsrfToken['token'],
                 'Content-Type': 'application/json',
             }
         })
