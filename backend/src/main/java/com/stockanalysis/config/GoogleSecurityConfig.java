@@ -81,7 +81,7 @@ public class GoogleSecurityConfig {
                 )
             )
             
-            // Session management
+            // Session management (prevent expired sessions prohibiting functionality)
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
@@ -117,8 +117,6 @@ public class GoogleSecurityConfig {
                     
                     HttpSession session = request.getSession(false);
                     
-                    
-                    
                     if (session != null) {
                         Object userId = session.getAttribute("USER_ID");
                         if (userId != null) {
@@ -144,8 +142,6 @@ public class GoogleSecurityConfig {
                     
                     chain.doFilter(request, response);
                     
-                    // Log authentication state after request
-                   
                 }
             }, UsernamePasswordAuthenticationFilter.class)
             
