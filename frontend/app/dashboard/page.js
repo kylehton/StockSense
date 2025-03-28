@@ -109,18 +109,7 @@ export default function Dashboard() {
 
     async function checkUser() {
         try {
-            // Get fresh CSRF token first
-            const csrfResponse = await fetch('http://localhost:8080/xsrf', {
-                method: 'GET',
-                credentials: 'include',
-            });
-            
-            if (!csrfResponse.ok) {
-                console.error('Failed to get CSRF token');
-                return false;
-            }
-            
-            const { token: csrfToken } = await csrfResponse.json();
+            const xsrfToken = getXSRFToken();
             
             // Make the check request with the CSRF token
             const response = await fetch('http://localhost:8080/check', {
@@ -128,7 +117,7 @@ export default function Dashboard() {
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': csrfToken
+                    'X-XSRF-TOKEN': xsrfToken
                 }
             });
 
@@ -198,7 +187,7 @@ export default function Dashboard() {
             const xsrfToken = await getXSRFToken();
             console.log("Retrieving stock data for:", stockSymbol);
             setSelectedStock(stockSymbol); // Set the selected stock
-            const response = await fetch(`http://localhost:8080/generatenews?symbol=${stockSymbol}`, {
+            const response = await fetch(`http://localhost:8080/news/generate?symbol=${stockSymbol}`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
