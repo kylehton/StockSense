@@ -37,8 +37,8 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-public class GoogleSecurityConfig {
-    private static final Logger logger = LoggerFactory.getLogger(GoogleSecurityConfig.class);
+public class WebSecurityConfig {
+    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -67,7 +67,6 @@ public class GoogleSecurityConfig {
         logger.info("Configuring security filter chain...");
 
         http
-            // Basic setup
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
                 // Enable CSRF protection with a custom token repository, readable by JavaScript
@@ -103,10 +102,10 @@ public class GoogleSecurityConfig {
                     .requestMatchers("/xsrf", "/google/auth", "/check").permitAll()
                     
                     // Semi-public endpoints that need session but not full auth
-                    .requestMatchers("/getsession", "/getsymbols").permitAll()
+                    .requestMatchers("/getsession", "db/getsymbols").permitAll()
                     
                     // Protected endpoints that need full authentication
-                    .requestMatchers("/add", "/delete", "/adduser", "/generatenews").hasAuthority("USER")
+                    .requestMatchers("/db/addsymbol", "/db/deletesymbol", "/db/adduser", "/news/generate", "/news/get").hasAuthority("USER")
                     
                     // Default to requiring authentication
                     .anyRequest().authenticated();

@@ -9,10 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -20,12 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/db") // Base URL for all endpoints in this controller
 public class DBController {
     private static final Logger logger = LoggerFactory.getLogger(DBController.class);
 
@@ -39,7 +37,7 @@ public class DBController {
             this.dbService = new DBService();
     }
 
-    @RequestMapping("/testdb")
+    @GetMapping("/testdb")
     public void testDB() {
         try {
             // Execute a query and get a ResultSet
@@ -56,7 +54,7 @@ public class DBController {
         }
     }
 
-    @RequestMapping("/getsymbols")
+    @GetMapping("/getsymbols")
     public ArrayList<String> getSymbolsFromDB(HttpSession session) {
         try {
             System.out.println("Fetching symbols from DB . . .");
@@ -119,7 +117,7 @@ public class DBController {
         }
     }
 
-    @PostMapping("/add")
+    @PostMapping("/addsymbol")
     public String addToDB(HttpSession session, @RequestParam String symbol) {
         try{
         String user_id = session.getAttribute("USER_ID").toString();
@@ -131,7 +129,7 @@ public class DBController {
         return "Successfully added symbol: "+symbol;
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/deletesymbol")
     public String DeleteFromDB(HttpSession session, @RequestParam String symbol) {
         try{
         String google_id = session.getAttribute("USER_ID").toString();
