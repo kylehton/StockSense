@@ -57,7 +57,7 @@ export default function Dashboard() {
             console.log("Adding symbol:", symbol);
             const xsrfToken = await getXSRFToken();
 
-            const response = await fetch(`http://localhost:8080/add?symbol=${symbol}`, {
+            const response = await fetch(`http://localhost:8080/db/addsymbol?symbol=${symbol}`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -86,7 +86,7 @@ export default function Dashboard() {
             const xsrfToken = await getXSRFToken();
             console.log("Deleting symbol:", stockSymbol);
             
-            const response = await fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
+            const response = await fetch(`http://localhost:8080/db/deletesymbol?symbol=${stockSymbol}`, {
                 method: 'DELETE',
                 credentials: 'include',
                 headers: {
@@ -112,7 +112,7 @@ export default function Dashboard() {
             const xsrfToken = getXSRFToken();
             
             // Make the check request with the CSRF token
-            const response = await fetch('http://localhost:8080/check', {
+            const response = await fetch('http://localhost:8080/db/check', {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -138,7 +138,7 @@ export default function Dashboard() {
         try {
             const xsrfToken = await getXSRFToken();
             console.log("User does not exist, creating new user.")
-            const response = await fetch('http://localhost:8080/adduser', {
+            const response = await fetch('http://localhost:8080/db/adduser', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -161,7 +161,7 @@ export default function Dashboard() {
         try {
             const xsrfToken = await getXSRFToken();
             console.log("Loading watchlist.");
-            const response = await fetch('http://localhost:8080/getsymbols', {
+            const response = await fetch('http://localhost:8080/db/getsymbols', {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
