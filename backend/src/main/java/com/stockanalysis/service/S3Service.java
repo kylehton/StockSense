@@ -63,6 +63,7 @@ public class S3Service {
     
 
     public String[][] readNewsObjectContent(String objectKey) {
+        System.out.println("FULL: "+bucketName+"/"+objectKey);
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(objectKey)

@@ -22,8 +22,8 @@ public class S3Controller {
     // scraping for easier passthrough of data parameters to S3 bucket
 
     @RequestMapping("/retrieve")
-    public String[][] retrieveFromS3(@RequestParam String id, HttpSession session) {
-        return s3Service.readNewsObjectContent(id);
+    public String[][] retrieveFromS3(@RequestParam String key, HttpSession session) {
+        return s3Service.readNewsObjectContent(key);
     }
 
 }

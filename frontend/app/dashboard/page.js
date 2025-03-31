@@ -86,12 +86,10 @@ export default function Dashboard() {
     }
 
     async function checkUser() {
-        //const xsrfToken = await getXSRFToken();
         const response = await fetch('http://localhost:8080/db/check', {
             method: 'GET',
             credentials: 'include',
             headers: {
-                //'X-XSRF-Token': xsrfToken['token'],
                 'Content-Type': 'application/json',
             }
         })
@@ -104,13 +102,11 @@ export default function Dashboard() {
     }
 
     async function addUser() {
-            //const xsrfToken = await getXSRFToken();
             console.log("User does not exist, creating new user.")
             const response = await fetch('http://localhost:8080/db/adduser', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    //'X-XSRF-Token': xsrfToken['token'],
                     'Content-Type': 'application/json',
                 }
             });
@@ -122,13 +118,11 @@ export default function Dashboard() {
     }
 
     async function loadWatchlist() {
-        //const xsrfToken = await getXSRFToken();
         console.log("Loading watchlist.");
         const response = await fetch('http://localhost:8080/db/getsymbols', {
             method: 'GET',
             credentials: 'include',
             headers: {
-                //'X-XSRF-TOKEN': xsrfToken['token'],
                 'Content-Type': 'application/json',
             }
         })
@@ -143,6 +137,60 @@ export default function Dashboard() {
             setWatchlist(data); 
         })
         .catch((error) => console.error("Error loading watchlist:", error));
+    }
+
+    const setNewsKey = async (stockSymbol, key) => {
+        const xsrfToken = await getXSRFToken();
+        console.log("Setting news key for:", stockSymbol);
+        const response = await fetch(`http://localhost:8080/db/setnewskey?symbol=${stockSymbol}&key=${key}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'X-XSRF-Token': xsrfToken,
+                'Content-Type': 'application/json',
+            }
+        })
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const returnKey = await response.text();
+        return returnKey;
+    }
+
+    const fetchNewsKey = async (stockSymbol) => {
+        const xsrfToken = await getXSRFToken();
+        console.log("Retrieving stock data for:", stockSymbol);
+        const response = await fetch(`http://localhost:8080/db/getnewskey?symbol=${stockSymbol}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'X-XSRF-Token': xsrfToken,
+                'Content-Type': 'application/json',
+            }
+        })
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const key = await response.text();
+        return key;
+    }
+
+    const fetchNewsData = async (symbol, key) => {
+        const xsrfToken = await getXSRFToken();
+        console.log("Retrieving stock data for:", key);
+        const response = await fetch(`http://localhost:8080/s3/retrieve?key=stock_news/${symbol}/${key}.json`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'X-XSRF-Token': xsrfToken,
+                'Content-Type': 'application/json',
+            }
+        })
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const newsText = await response.text();
+        return newsText;
     }
 
     const handleStockDataOpen = async (stockSymbol) => {
@@ -160,8 +208,14 @@ export default function Dashboard() {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            const newsText = await response.text();
-
+            const keyResponse = await response.text();
+            console.log("setnewskey")
+            const newsKey = await setNewsKey(stockSymbol, keyResponse);
+            console.log("fetchnewskey")
+            const retrieveKey = await fetchNewsKey(stockSymbol);
+            console.log("fetchnewsdata")
+            const newsText = await fetchNewsData(stockSymbol, retrieveKey);
+            console.log("success!!")
             const splitNews = JSON.parse(newsText);
             console.log("News data:", splitNews);
 
@@ -177,7 +231,8 @@ export default function Dashboard() {
                 storeItems.push(newItem);
             }
             setNewsItems(storeItems);
-        }
+    }
+    
 
     useEffect(() => {
         async function initialize() {

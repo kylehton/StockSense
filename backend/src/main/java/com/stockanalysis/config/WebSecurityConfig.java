@@ -105,7 +105,7 @@ public class WebSecurityConfig {
                     .requestMatchers("/getsession", "/db/getsymbols").permitAll()
                     
                     // Protected endpoints that need full authentication
-                    .requestMatchers("/db/addsymbol", "/db/deletesymbol", "/db/adduser", "/news/generate", "/news/get").hasAuthority("USER")
+                    .requestMatchers("/db/addsymbol", "/db/deletesymbol", "/db/adduser", "/news/generate", "/news/get", "/s3/retrieve", "/db/setnewskey", "/db/getnewskey").hasAuthority("USER")
                     
                     // Default to requiring authentication
                     .anyRequest().authenticated();

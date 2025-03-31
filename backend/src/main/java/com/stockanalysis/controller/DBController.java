@@ -100,6 +100,32 @@ public class DBController {
         return "Successfully deleted symbol: "+symbol;
     }
 
+    @PostMapping("/setnewskey")
+    public String setS3NewsKey(HttpSession session, @RequestParam String symbol, @RequestParam String key) {
+        try
+        {
+            return dbService.storeNewsKey(symbol, key, this.stmt);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "Failed to store news key: "+e;
+        }
+    }
+
+    @GetMapping("/getnewskey")
+    public String getS3NewsKey(@RequestParam String symbol) {
+        try
+        {
+            return dbService.getNewsKey(symbol, this.stmt);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "Failed to get news key: "+e;
+        }
+    }
+
 }
 
 
