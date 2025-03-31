@@ -38,8 +38,7 @@ public class GoogleAuthenticationController {
             session.setAttribute("USER_ID", userId);
             session.setAttribute("EMAIL", payload.get("email"));
 
-            return ResponseEntity.ok()
-            .body("Authenticated user: " + payload.get("email"));
+            return ResponseEntity.ok().body("Authenticated user: " + payload.get("email"));
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Authentication error: " + e.getMessage());
         }

@@ -52,7 +52,6 @@ const GoogleSignIn = () => {
                   'Content-Type': 'application/json',
               }
           });
-          //document.cookie = `XSRF-TOKEN=${xsrfToken.headers.get('x-xsrf-token')}; path=/`; // Store it in cookies
           
           return xsrfToken.headers.get('x-xsrf-token');
       } catch (error) {
@@ -66,8 +65,7 @@ const GoogleSignIn = () => {
         const xsrf = await getXSRFToken();
         //response.credential is the JWT token for the authenticated user
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
-        console.log("Creds:",response.credential);
-        console.log("XSRF from backend:", xsrf);
+        
 
         const res = await fetch(`http://localhost:8080/google/auth?id=${response.credential}`, {
           method: "POST",
@@ -78,7 +76,6 @@ const GoogleSignIn = () => {
           },
         })
         if (res.ok) {
-          console.log(res.text());
           router.push('/dashboard');
         }
         else {

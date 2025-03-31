@@ -24,13 +24,13 @@ public class GenerateNewsController {
     }
 
     @PostMapping("/generate")
-    public String[][] generateNews(@RequestParam String symbol) {
+    public String generateNews(@RequestParam String symbol) {
         // generates news, places it into S3 bucket, then returns its respective S3 key
         String[][] news = generateNewsService.generateNews(symbol);
         System.out.println("News: "+ news[0][0] + news[1][0] + news[2][0] + news[3][0]);
         String s3Key = s3Service.uploadAVNewsData(symbol, news);
         System.out.println("S3 Key: " + s3Key);
-        return news;
+        return s3Key;
     }
 
     @GetMapping("/get")

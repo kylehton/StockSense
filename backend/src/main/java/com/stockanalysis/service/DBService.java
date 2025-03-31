@@ -137,5 +137,49 @@ public class DBService {
 
         }
     }
+
+    public String storeNewsKey(String symbol, String key, Statement stmt) {
+        try {
+            Connection conn = stmt.getConnection();
+            // Use PreparedStatement to prevent SQL injection
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE stocks SET newskey = ? WHERE symbol = ?");
+            pstmt.setString(1, key);
+
+            pstmt.setString(2, symbol);
+            
+            // Execute the update
+            pstmt.executeUpdate();
+            System.out.println("Stored news key: "+key);
+            return key;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to store news key: "+e;
+        }
+    }
+
+    public String getNewsKey(String symbol, Statement stmt)
+    {
+        try 
+        {
+            Connection conn = stmt.getConnection();
+            System.out.println("GETTING NEWS KEY for: "+symbol);
+            PreparedStatement pstmt = conn.prepareStatement("SELECT DISTINCT newskey FROM stocks WHERE symbol = ?");
+            pstmt.setString(1, symbol);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) 
+            {
+                String key = rs.getString("newskey");
+                System.out.println("News Key: "+key);
+                return key;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "Failed to get news key: "+e;
+        }
+        return "Failed to get news key";
+    }
 }
 
