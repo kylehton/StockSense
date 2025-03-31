@@ -28,6 +28,7 @@ export default function Dashboard() {
     const [newsItems, setNewsItems] = useState([]);
     const [selectedStock, setSelectedStock] = useState("");
 
+<<<<<<< HEAD
 
     async function getXSRFToken() {
         try {
@@ -53,13 +54,22 @@ export default function Dashboard() {
             throw error;
         }
       }
+=======
+    const getXSRFToken = async () => {
+        const xsrfToken = await fetch('http://localhost:8080/xsrf', {
+            method: 'GET',
+            credentials: 'include',
+        })
+        const data = await xsrfToken.json();
+        return data.token; // return XSRF token value
+    }
+>>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
 
 
     const handleAddSymbol = async () => {
-        try {
-            console.log("Adding symbol:", symbol);
-            const xsrfToken = await getXSRFToken();
+        console.log("Adding symbol:", symbol);
 
+<<<<<<< HEAD
             const response = await fetch(`http://localhost:8080/db/addsymbol?symbol=${symbol}`, {
                 method: 'POST',
                 credentials: 'include',
@@ -68,23 +78,32 @@ export default function Dashboard() {
                     'Content-Type': 'application/json',
                 }
             });
+=======
+        const xsrfToken = await getXSRFToken();
+>>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
 
+        const response = await fetch(`http://localhost:8080/add?symbol=${symbol}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'X-XSRF-Token': xsrfToken['token'],
+                'Content-Type': 'application/json',
+            }
+        })
+        .then((response) => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-
-            const result = await response.text();
-            console.log("Add symbol result:", result);
-            
-            setSymbol("");
-            await loadWatchlist();
-            setOpen(false);
-        } catch (error) {
-            console.error("Error adding symbol:", error);
-        }
+            return response.text();
+        })
+        .catch((error) => console.error("Error adding symbol:", error));
+        setSymbol("");
+        await loadWatchlist();
+        setOpen(false);
     };
 
     const handleDeleteSymbol = async (stockSymbol) => {
+<<<<<<< HEAD
         try {
             const xsrfToken = await getXSRFToken();
             console.log("Deleting symbol:", stockSymbol);
@@ -98,19 +117,31 @@ export default function Dashboard() {
                 }
             });
 
+=======
+        const xsrfToken = await getXSRFToken();
+        console.log("Deleting symbol:", stockSymbol);
+        const response = await fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+                'X-XSRF-Token': xsrfToken['token'],
+                'Content-Type': 'application/json',
+            }
+        })
+        .then((response) => {
+>>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-
-            const result = await response.text();
-            console.log("Delete symbol result:", result);
-            await loadWatchlist();
-        } catch (error) {
-            console.error("Error deleting symbol:", error);
-        }
+            return response.text();
+        })
+        .catch((error) => console.error("Error deleting symbol:", error));
+        setSymbol("");
+        await loadWatchlist();
     }
 
     async function checkUser() {
+<<<<<<< HEAD
         try {
             const xsrfToken = getXSRFToken();
             
@@ -134,18 +165,33 @@ export default function Dashboard() {
         } catch (error) {
             console.error('Error checking user:', error);
             return false;
+=======
+        //const xsrfToken = await getXSRFToken();
+        const response = await fetch('http://localhost:8080/check', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                //'X-XSRF-Token': xsrfToken['token'],
+                'Content-Type': 'application/json',
+            }
+        })
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+>>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
         }
+        const result = await response.json();
+        console.log("User exists:", result);
+        return await result;
     }
 
     async function addUser() {
-        try {
-            const xsrfToken = await getXSRFToken();
+            //const xsrfToken = await getXSRFToken();
             console.log("User does not exist, creating new user.")
             const response = await fetch('http://localhost:8080/db/adduser', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    'X-XSRF-TOKEN': xsrfToken,
+                    //'X-XSRF-Token': xsrfToken['token'],
                     'Content-Type': 'application/json',
                 }
             });
@@ -154,13 +200,10 @@ export default function Dashboard() {
             }
             const result = await response.json();
             console.log("Result of add:", result);
-        } catch (error) {
-            console.error("Error adding user:", error);
-            throw error;
-        }
     }
 
     async function loadWatchlist() {
+<<<<<<< HEAD
         try {
             const xsrfToken = await getXSRFToken();
             console.log("Loading watchlist.");
@@ -173,19 +216,33 @@ export default function Dashboard() {
                 }
             });
             
+=======
+        //const xsrfToken = await getXSRFToken();
+        console.log("Loading watchlist.");
+        const response = await fetch('http://localhost:8080/getsymbols', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                //'X-XSRF-TOKEN': xsrfToken['token'],
+                'Content-Type': 'application/json',
+            }
+        })
+        .then((response) => {
+>>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            
-            const data = await response.json();
+            return response.json();
+        })
+        .then((data) => {
             console.log("Watchlist data:", data);
-            setWatchlist(data);
-        } catch (error) {
-            console.error("Error loading watchlist:", error);
-        }
+            setWatchlist(data); 
+        })
+        .catch((error) => console.error("Error loading watchlist:", error));
     }
 
     const handleStockDataOpen = async (stockSymbol) => {
+<<<<<<< HEAD
         try {
             const xsrfToken = await getXSRFToken();
             console.log("Retrieving stock data for:", stockSymbol);
@@ -199,10 +256,22 @@ export default function Dashboard() {
                 }
             });
             
+=======
+        const xsrfToken = await getXSRFToken();
+        console.log("Retrieving stock data for:", stockSymbol);
+        setSelectedStock(stockSymbol); // Set the selected stock
+        const response = await fetch(`http://localhost:8080/generatenews?symbol=${stockSymbol}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'X-FSRF-Token': xsrfToken['token'],
+                'Content-Type': 'application/json',
+            }
+        })
+>>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            
             const newsText = await response.text();
 
             const splitNews = JSON.parse(newsText);
@@ -221,10 +290,6 @@ export default function Dashboard() {
             }
             setNewsItems(storeItems);
         }
-        catch {
-            console.error("Error retrieving stock data:", error);
-        }
-    }
 
     useEffect(() => {
         async function initialize() {
