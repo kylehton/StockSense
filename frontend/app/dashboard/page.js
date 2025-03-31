@@ -43,11 +43,11 @@ export default function Dashboard() {
 
         const xsrfToken = await getXSRFToken();
 
-        const response = await fetch(`http://localhost:8080/add?symbol=${symbol}`, {
+        const response = await fetch(`http://localhost:8080/db/addsymbol?symbol=${symbol}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
-                'X-XSRF-Token': xsrfToken['token'],
+                'X-XSRF-Token': xsrfToken,
                 'Content-Type': 'application/json',
             }
         })
@@ -66,11 +66,11 @@ export default function Dashboard() {
     const handleDeleteSymbol = async (stockSymbol) => {
         const xsrfToken = await getXSRFToken();
         console.log("Deleting symbol:", stockSymbol);
-        const response = await fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
+        const response = await fetch(`http://localhost:8080/db/deletesymbol?symbol=${stockSymbol}`, {
             method: 'DELETE',
             credentials: 'include',
             headers: {
-                'X-XSRF-Token': xsrfToken['token'],
+                'X-XSRF-Token': xsrfToken,
                 'Content-Type': 'application/json',
             }
         })
@@ -87,7 +87,7 @@ export default function Dashboard() {
 
     async function checkUser() {
         //const xsrfToken = await getXSRFToken();
-        const response = await fetch('http://localhost:8080/check', {
+        const response = await fetch('http://localhost:8080/db/check', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -124,7 +124,7 @@ export default function Dashboard() {
     async function loadWatchlist() {
         //const xsrfToken = await getXSRFToken();
         console.log("Loading watchlist.");
-        const response = await fetch('http://localhost:8080/getsymbols', {
+        const response = await fetch('http://localhost:8080/db/getsymbols', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -149,11 +149,11 @@ export default function Dashboard() {
         const xsrfToken = await getXSRFToken();
         console.log("Retrieving stock data for:", stockSymbol);
         setSelectedStock(stockSymbol); // Set the selected stock
-        const response = await fetch(`http://localhost:8080/generatenews?symbol=${stockSymbol}`, {
+        const response = await fetch(`http://localhost:8080/news/generate?symbol=${stockSymbol}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
-                'X-FSRF-Token': xsrfToken['token'],
+                'X-XSRF-Token': xsrfToken,
                 'Content-Type': 'application/json',
             }
         })
