@@ -229,11 +229,13 @@ export default function Dashboard() {
                 const newItem = {
                     title: splitNews[0][i],
                     publisher: splitNews[1][i],
-                    url: splitNews[2][i]
+                    url: splitNews[2][i],
+                    score: splitNews[3][i]
                 }
                 console.log("New item #", i+1, ":", newItem);
                 storeItems.push(newItem);
             }
+            console.log("Stored news items:", storeItems);
             setNewsItems(storeItems);
     }
     
@@ -315,6 +317,7 @@ export default function Dashboard() {
                                 className="text-blue-600 hover:underline text-sm">
                                     Read more
                                 </a>
+                                <p className="text-sm text-gray-600 mb-2">Score: {item.score}</p>
                             </div>
                         ))}
                     </div>
