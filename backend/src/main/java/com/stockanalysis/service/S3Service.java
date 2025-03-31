@@ -77,7 +77,7 @@ public class S3Service {
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(jsonContent, String[][].class);
         } catch (Exception e) {
-            throw new RuntimeException("Error reading news data from S3: " + e.getMessage(), e);
+            return null;
         }
     }
 }

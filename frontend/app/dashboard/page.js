@@ -193,9 +193,9 @@ export default function Dashboard() {
         return newsText;
     }
 
-    const handleStockDataOpen = async (stockSymbol) => {
+    const newGenerateNews = async (stockSymbol) => {
         const xsrfToken = await getXSRFToken();
-        console.log("Retrieving stock data for:", stockSymbol);
+        console.log("GENERATING NEW NEWS:", stockSymbol);
         setSelectedStock(stockSymbol); // Set the selected stock
         const response = await fetch(`http://localhost:8080/news/generate?symbol=${stockSymbol}`, {
             method: 'POST',
@@ -209,13 +209,17 @@ export default function Dashboard() {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const keyResponse = await response.text();
-            console.log("setnewskey")
             const newsKey = await setNewsKey(stockSymbol, keyResponse);
-            console.log("fetchnewskey")
+            const newsText = await fetchNewsData(stockSymbol, newsKey);
+            return newsText;
+    }
+
+    const handleStockDataOpen = async (stockSymbol) => {
             const retrieveKey = await fetchNewsKey(stockSymbol);
-            console.log("fetchnewsdata")
-            const newsText = await fetchNewsData(stockSymbol, retrieveKey);
-            console.log("success!!")
+            let newsText = await fetchNewsData(stockSymbol, retrieveKey);
+            if (newsText === "" || newsText === null) {
+                newsText = await newGenerateNews(stockSymbol);
+            }
             const splitNews = JSON.parse(newsText);
             console.log("News data:", splitNews);
 
