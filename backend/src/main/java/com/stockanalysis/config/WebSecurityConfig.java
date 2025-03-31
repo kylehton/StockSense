@@ -83,7 +83,7 @@ public class WebSecurityConfig {
                 )
             )
             
-            // Session management (prevent expired sessions prohibiting functionality)
+            // Session management
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .maximumSessions(1)
@@ -120,6 +120,8 @@ public class WebSecurityConfig {
                     
                     HttpSession session = request.getSession(false);
                     
+                    
+                    
                     if (session != null) {
                         Object userId = session.getAttribute("USER_ID");
                         if (userId != null) {
@@ -145,6 +147,8 @@ public class WebSecurityConfig {
                     
                     chain.doFilter(request, response);
                     
+                    // Log authentication state after request
+                   
                 }
             }, UsernamePasswordAuthenticationFilter.class)
             
