@@ -28,33 +28,6 @@ export default function Dashboard() {
     const [newsItems, setNewsItems] = useState([]);
     const [selectedStock, setSelectedStock] = useState("");
 
-<<<<<<< HEAD
-
-    async function getXSRFToken() {
-        try {
-            const response = await fetch('http://localhost:8080/xsrf', {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to fetch XSRF token: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log("XSRF token fetched successfully", data.token);
-            console.log("XSRF token from header:", response.headers.get("X-XSRF-TOKEN"));
-            console.log("SESSION from header:", response.headers.get("Set-Cookie"));
-            return data.token;
-        } catch (error) {
-            console.error("Error fetching XSRF token:", error);
-            throw error;
-        }
-      }
-=======
     const getXSRFToken = async () => {
         const xsrfToken = await fetch('http://localhost:8080/xsrf', {
             method: 'GET',
@@ -63,24 +36,12 @@ export default function Dashboard() {
         const data = await xsrfToken.json();
         return data.token; // return XSRF token value
     }
->>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
 
 
     const handleAddSymbol = async () => {
         console.log("Adding symbol:", symbol);
 
-<<<<<<< HEAD
-            const response = await fetch(`http://localhost:8080/db/addsymbol?symbol=${symbol}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'X-XSRF-TOKEN': xsrfToken,
-                    'Content-Type': 'application/json',
-                }
-            });
-=======
         const xsrfToken = await getXSRFToken();
->>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
 
         const response = await fetch(`http://localhost:8080/add?symbol=${symbol}`, {
             method: 'POST',
@@ -103,21 +64,6 @@ export default function Dashboard() {
     };
 
     const handleDeleteSymbol = async (stockSymbol) => {
-<<<<<<< HEAD
-        try {
-            const xsrfToken = await getXSRFToken();
-            console.log("Deleting symbol:", stockSymbol);
-            
-            const response = await fetch(`http://localhost:8080/db/deletesymbol?symbol=${stockSymbol}`, {
-                method: 'DELETE',
-                credentials: 'include',
-                headers: {
-                    'X-XSRF-TOKEN': xsrfToken,
-                    'Content-Type': 'application/json',
-                }
-            });
-
-=======
         const xsrfToken = await getXSRFToken();
         console.log("Deleting symbol:", stockSymbol);
         const response = await fetch(`http://localhost:8080/delete?symbol=${stockSymbol}`, {
@@ -129,7 +75,6 @@ export default function Dashboard() {
             }
         })
         .then((response) => {
->>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -141,31 +86,6 @@ export default function Dashboard() {
     }
 
     async function checkUser() {
-<<<<<<< HEAD
-        try {
-            const xsrfToken = getXSRFToken();
-            
-            // Make the check request with the CSRF token
-            const response = await fetch('http://localhost:8080/db/check', {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': xsrfToken
-                }
-            });
-
-            if (!response.ok) {
-                console.error('Check user request failed:', response.status);
-                return false;
-            }
-
-            const result = await response.json();
-            return result;
-        } catch (error) {
-            console.error('Error checking user:', error);
-            return false;
-=======
         //const xsrfToken = await getXSRFToken();
         const response = await fetch('http://localhost:8080/check', {
             method: 'GET',
@@ -177,7 +97,6 @@ export default function Dashboard() {
         })
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
->>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
         }
         const result = await response.json();
         console.log("User exists:", result);
@@ -203,20 +122,6 @@ export default function Dashboard() {
     }
 
     async function loadWatchlist() {
-<<<<<<< HEAD
-        try {
-            const xsrfToken = await getXSRFToken();
-            console.log("Loading watchlist.");
-            const response = await fetch('http://localhost:8080/db/getsymbols', {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'X-XSRF-TOKEN': xsrfToken,
-                    'Content-Type': 'application/json',
-                }
-            });
-            
-=======
         //const xsrfToken = await getXSRFToken();
         console.log("Loading watchlist.");
         const response = await fetch('http://localhost:8080/getsymbols', {
@@ -228,7 +133,6 @@ export default function Dashboard() {
             }
         })
         .then((response) => {
->>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
@@ -242,21 +146,6 @@ export default function Dashboard() {
     }
 
     const handleStockDataOpen = async (stockSymbol) => {
-<<<<<<< HEAD
-        try {
-            const xsrfToken = await getXSRFToken();
-            console.log("Retrieving stock data for:", stockSymbol);
-            setSelectedStock(stockSymbol); // Set the selected stock
-            const response = await fetch(`http://localhost:8080/news/generate?symbol=${stockSymbol}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'X-XSRF-TOKEN': xsrfToken,
-                    'Content-Type': 'application/json',
-                }
-            });
-            
-=======
         const xsrfToken = await getXSRFToken();
         console.log("Retrieving stock data for:", stockSymbol);
         setSelectedStock(stockSymbol); // Set the selected stock
@@ -268,7 +157,6 @@ export default function Dashboard() {
                 'Content-Type': 'application/json',
             }
         })
->>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }

@@ -43,18 +43,6 @@ const GoogleSignIn = () => {
 
     }, [clientID]);
     
-<<<<<<< HEAD
-    /**
-     * Retrieves CSRF token to protect against Cross-Site Request Forgery attacks.
-     * 
-     * The flow works as follows:
-     * 1. A request to /xsrf endpoint returns the CSRF token in the response body
-     * 2. This token is included in subsequent requests as the X-XSRF-TOKEN header
-     * 3. Spring Security validates that the X-XSRF-TOKEN header matches the expected token
-     * 
-     */
-=======
->>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
     async function getXSRFToken() {
       try {
           const xsrfToken = await fetch('http://localhost:8080/xsrf', {
@@ -79,12 +67,7 @@ const GoogleSignIn = () => {
         //response.credential is the JWT token for the authenticated user
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
         console.log("Creds:",response.credential);
-<<<<<<< HEAD
-=======
         console.log("XSRF from backend:", xsrf);
-        console.log("Session ID:", getCookie("JSESSIONID"))
-        console.log("Session ID from backend:", await getSessionID());
->>>>>>> parent of 29f2e0b (working csrf authentication for all endpoints)
 
         const res = await fetch(`http://localhost:8080/google/auth?id=${response.credential}`, {
           method: "POST",
