@@ -8,6 +8,7 @@ class StockAnalysisApplicationTests {
 
     @Test
     void contextLoads() {
-        // Your test logic here
+        // No test logic, just checks if the Spring application context loads successfully
+        // testing for components are done through endpoints
     }
 }
