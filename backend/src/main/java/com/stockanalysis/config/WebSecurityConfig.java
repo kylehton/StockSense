@@ -78,7 +78,7 @@ public class WebSecurityConfig {
                     !"OPTIONS".equals(request.getMethod()) && 
                     !"/xsrf".equals(request.getServletPath()) &&
                     !"/google/auth".equals(request.getServletPath()) &&
-                    !"/check".equals(request.getServletPath()) &&
+                    !"/db/check".equals(request.getServletPath()) &&
                     CsrfFilter.DEFAULT_CSRF_MATCHER.matches(request)
                 )
             )
@@ -86,9 +86,18 @@ public class WebSecurityConfig {
             // Session management
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionFixation().newSession()
                 .maximumSessions(1)
                 // '/xsrf' endpoint called upon expiring of session to re-instantiate a new session
                 .expiredUrl("/xsrf")
+            )
+            
+            // Configure session timeout (30 minutes)
+            .httpBasic(basic -> basic.disable())
+            .formLogin(form -> form.disable())
+            .rememberMe(remember -> remember
+                .alwaysRemember(true)
+                .tokenValiditySeconds(1800) // 30 minutes
             )
             
             // Request authorization
@@ -99,10 +108,10 @@ public class WebSecurityConfig {
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     
                     // Public endpoints
-                    .requestMatchers("/xsrf", "/google/auth", "/check").permitAll()
+                    .requestMatchers("/xsrf", "/google/auth", "/db/check").permitAll()
                     
                     // Semi-public endpoints that need session but not full auth
-                    .requestMatchers("/getsession", "db/getsymbols").permitAll()
+                    .requestMatchers("/getsession", "/db/getsymbols").permitAll()
                     
                     // Protected endpoints that need full authentication
                     .requestMatchers("/db/addsymbol", "/db/deletesymbol", "/db/adduser", "/news/generate", "/news/get").hasAuthority("USER")
@@ -118,17 +127,38 @@ public class WebSecurityConfig {
                         HttpServletResponse response, FilterChain chain)
                         throws ServletException, IOException {
                     
-                    HttpSession session = request.getSession(false);
+                    String requestUri = request.getRequestURI();
+                    logger.debug("Processing request: {} {}");
                     
+                    // Always get or create a session as per our ALWAYS policy
+                    HttpSession session = request.getSession(true);
+                    String sessionId = session.getId();
                     
+                    // Session validation - check creation time and last accessed time
+                    long creationTime = session.getCreationTime();
+                    long lastAccessedTime = session.getLastAccessedTime();
+                    long currentTime = System.currentTimeMillis();
+                    int maxInactiveInterval = session.getMaxInactiveInterval();
+                    
+                    logger.debug("Session validation - ID: {}, Created: {}, Last Accessed: {}, Max Inactive: {} seconds");
+                    
+                    // Check if session is about to expire and renew if necessary
+                    if ((currentTime - lastAccessedTime) > (maxInactiveInterval * 1000 * 0.8)) {
+                        logger.info("Session {} is approaching timeout, refreshing session");
+                        session.setMaxInactiveInterval(maxInactiveInterval); // Reset the timer
+                    }
                     
                     if (session != null) {
                         Object userId = session.getAttribute("USER_ID");
+                        logger.debug("Session {} has userId: {}");
+                        
                         if (userId != null) {
                             Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
                             
                             if (currentAuth == null || !currentAuth.isAuthenticated() || 
                                 currentAuth instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+                                
+                                logger.info("Creating authentication for user ID: {} in session: {}", userId, sessionId);
                                 
                                 List<GrantedAuthority> authorities = Arrays.asList(
                                     new SimpleGrantedAuthority("USER")
@@ -141,14 +171,31 @@ public class WebSecurityConfig {
                                 );
                                 
                                 SecurityContextHolder.getContext().setAuthentication(auth);
+                                logger.debug("Authentication set in SecurityContext for user: {}", userId);
                             }
                         }
                     }
                     
+                    // Log the current authentication state before processing
+                    Authentication authBefore = SecurityContextHolder.getContext().getAuthentication();
+                    logger.debug("Auth state before request: {}", 
+                            authBefore != null ? authBefore.getName() + " (authenticated: " + authBefore.isAuthenticated() + ")" : "null");
+                    
                     chain.doFilter(request, response);
                     
                     // Log authentication state after request
-                   
+                    Authentication authAfter = SecurityContextHolder.getContext().getAuthentication();
+                    logger.debug("Auth state after request {}: {} -> Status: {}", 
+                            requestUri,
+                            authAfter != null ? authAfter.getName() + " (authenticated: " + authAfter.isAuthenticated() + ")" : "null",
+                            response.getStatus());
+                    
+                    // Check if response indicates auth issues and log accordingly
+                    if (response.getStatus() == HttpStatus.UNAUTHORIZED.value() || 
+                        response.getStatus() == HttpStatus.FORBIDDEN.value()) {
+                        logger.warn("Authentication/Authorization issue detected for request: {} (Session: {})", 
+                                requestUri, sessionId);
+                    }
                 }
             }, UsernamePasswordAuthenticationFilter.class)
             
