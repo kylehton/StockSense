@@ -28,6 +28,7 @@ export default function Dashboard() {
     const [newsItems, setNewsItems] = useState([]);
     const [selectedStock, setSelectedStock] = useState("");
 
+
     async function getXSRFToken() {
         try {
             const response = await fetch('http://localhost:8080/xsrf', {
@@ -43,7 +44,9 @@ export default function Dashboard() {
             }
             
             const data = await response.json();
-            console.log("XSRF token fetched successfully");
+            console.log("XSRF token fetched successfully", data.token);
+            console.log("XSRF token from header:", response.headers.get("X-XSRF-TOKEN"));
+            console.log("SESSION from header:", response.headers.get("Set-Cookie"));
             return data.token;
         } catch (error) {
             console.error("Error fetching XSRF token:", error);
