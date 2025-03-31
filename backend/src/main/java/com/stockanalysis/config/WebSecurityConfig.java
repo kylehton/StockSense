@@ -99,7 +99,7 @@ public class WebSecurityConfig {
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     
                     // Public endpoints
-                    .requestMatchers("/xsrf", "/google/auth", "/check").permitAll()
+                    .requestMatchers("/xsrf", "/google/auth", "/db/check").permitAll()
                     
                     // Semi-public endpoints that need session but not full auth
                     .requestMatchers("/getsession", "/db/getsymbols").permitAll()
