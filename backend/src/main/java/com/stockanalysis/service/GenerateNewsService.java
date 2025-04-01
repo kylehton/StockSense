@@ -20,7 +20,7 @@ public class GenerateNewsService {
 
         String[][] newsInfo = new String[4][5];
         String api_key = dotenv.get("AV_API_KEY");
-        // Yahoo Finance API URL
+        // Alpha Vantage API URL
         String apiCallURL = "https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=" + stockSymbol + "&apikey=" + api_key;
                         
         HttpClient client = HttpClient.newHttpClient();
@@ -39,7 +39,7 @@ public class GenerateNewsService {
 
             // Loop through the news items and print title, publisher, and link
             // Store the first 5 items in newsInfo
-            // Columns are: Article Title (0), Publisher (1), Link (2)
+            // Columns are: Article Title (0), Publisher (1), Link (2), Sentiment Score (3)
             for (int i = 0; i < 5; i++) {
                 JSONObject newsItem = newsArray.getJSONObject(i);
                 newsInfo[0][i] = newsItem.getString("title");
