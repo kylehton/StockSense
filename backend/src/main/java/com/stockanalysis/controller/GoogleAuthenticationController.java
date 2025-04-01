@@ -33,10 +33,10 @@ public class GoogleAuthenticationController {
             String userId = payload.getSubject();
             
             System.out.println("Current Session ID: " + session.getId());
-            System.out.println("Storing userID: " + session.getAttribute("USER_ID"));
-            System.out.println("Storing email: " + session.getAttribute("EMAIL"));
+            System.out.println("Storing userID: " + session.getAttribute("user_id"));
+            System.out.println("Storing email: " + session.getAttribute("email"));
             session.setAttribute("USER_ID", userId);
-            session.setAttribute("EMAIL", payload.get("email"));
+            session.setAttribute("email", payload.get("email"));
 
             return ResponseEntity.ok().body("Authenticated user: " + payload.get("email"));
         } catch (IOException e) {

@@ -33,10 +33,6 @@ public class GenerateNewsController {
         return s3Key;
     }
 
-    @GetMapping("/get")
-    public String[][] getNews(@RequestParam String key) {
-        // retrieves news from S3 bucket using the S3 key
-        return s3Service.readNewsObjectContent(key);
-    }
+
 
 }
