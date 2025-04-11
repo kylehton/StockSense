@@ -32,7 +32,6 @@ public class GenerateNewsService {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             JSONObject jsonResponse = new JSONObject(response.body());
-            System.out.println(jsonResponse);
 
         // Extract the "news" array
             JSONArray newsArray = jsonResponse.getJSONArray("feed");
