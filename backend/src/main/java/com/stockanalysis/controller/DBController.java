@@ -51,7 +51,6 @@ public class DBController {
 
     @GetMapping("/getsymbols")
     public ArrayList<String> getSymbolsFromDB(HttpSession session) {
-        System.out.println("Fetching symbols from DB . . .");
         String google_id = session.getAttribute("USER_ID").toString();
         return dbService.getSymbols(google_id, this.stmt);
     }
@@ -59,17 +58,16 @@ public class DBController {
     @GetMapping("/check")
     public Boolean checkUser(HttpSession session) {
         String google_id = session.getAttribute("USER_ID").toString();
-        System.out.println("User Check Results: "+dbService.checkUserExists(google_id, this.stmt));
         return dbService.checkUserExists(google_id, this.stmt);
     }
 
     @PostMapping("/adduser")
-    public String addUser(HttpSession session) {
-        System.out.println("Adding user");
-        try{
-        String google_id = session.getAttribute("USER_ID").toString();
-        String email = session.getAttribute("EMAIL").toString();
-        return dbService.addUserToDB(google_id, email, this.stmt);
+    public String addUser(HttpSession session) 
+    {
+        try {
+            String google_id = session.getAttribute("USER_ID").toString();
+            String email = session.getAttribute("EMAIL").toString();
+            return dbService.addUserToDB(google_id, email, this.stmt);
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to add user: "+e;
@@ -78,7 +76,7 @@ public class DBController {
 
     @PostMapping("/addsymbol")
     public String addToDB(HttpSession session, @RequestParam String symbol) {
-        try{
+        try {
         String user_id = session.getAttribute("USER_ID").toString();
         dbService.addSymbol(user_id, this.stmt, symbol);
         } catch (Exception e) {
