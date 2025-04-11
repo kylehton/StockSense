@@ -313,13 +313,13 @@ export default function Dashboard() {
             <div id="stock-data-wrapper" className="rounded-lg mr-16 h-[90%] w-[50%] bg-white flex flex-col items-start justify-start p-6 overflow-y-auto">
             {selectedStock ? (
                 <>
-                    <h1 className="text-2xl font-bold mb-6">{selectedStock} News</h1>
+                    <h1 className="text-2xl font-bold mb-6">{selectedStock}</h1>
                     <div className="w-full">
                     <StockChart symbol={selectedStock} />
+                    <p className="text-lg font-semibold m-2 mt-10 mb-4 ">{selectedStock} News Articles</p>
                     {newsItems.map((item, index) => {
                         const score = parseFloat(item.score);
                         const formattedScore = score.toFixed(2);
-
                         // Determine color class based on score range
                         let scoreColorClass = "bg-gray-200 text-black"; // Neutral: -0.29 to 0.29
 
@@ -335,7 +335,7 @@ export default function Dashboard() {
 
                         return (
                             <div key={index} className="flex flex-col mb-4 p-4 border rounded-lg hover:bg-gray-50">
-                            <h2 className="text-lg font-semibold mb-1">{item.title}</h2>
+                            <h3 className="text-md font-semibold mb-1">{item.title}</h3>
                             <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
                                 <p>Source: {item.publisher}</p>
                                 <div className={`px-2 py-1 rounded-md font-medium ${scoreColorClass}`}>
