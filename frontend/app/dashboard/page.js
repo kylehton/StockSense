@@ -14,7 +14,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
- 
+
+import StockChart from './dashboardcomponents/StockChart';
 
 export default function Dashboard() {
 
@@ -215,29 +216,34 @@ export default function Dashboard() {
     }
 
     const handleStockDataOpen = async (stockSymbol) => {
-            const retrieveKey = await fetchNewsKey(stockSymbol);
+        try {
+            setSelectedStock(stockSymbol); // Always set first so UI shows heading
+            let retrieveKey = await fetchNewsKey(stockSymbol);
             let newsText = await fetchNewsData(stockSymbol, retrieveKey);
-            if (newsText === "" || newsText === null) {
+    
+            if (!newsText || newsText.trim() === "") {
                 newsText = await newGenerateNews(stockSymbol);
             }
+    
             const splitNews = JSON.parse(newsText);
-            console.log("News data:", splitNews);
-
             const storeItems = [];
+    
             const numItems = splitNews[0].length;
             for (let i = 0; i < numItems; i++) {
-                const newItem = {
+                storeItems.push({
                     title: splitNews[0][i],
                     publisher: splitNews[1][i],
                     url: splitNews[2][i],
                     score: splitNews[3][i]
-                }
-                console.log("New item #", i+1, ":", newItem);
-                storeItems.push(newItem);
+                });
             }
-            console.log("Stored news items:", storeItems);
             setNewsItems(storeItems);
-    }
+        } catch (error) {
+            console.error("Error loading news data:", error);
+            setNewsItems([]); // fallback to empty news instead of leaving old one or nothing
+        }
+    };
+    
     
 
     useEffect(() => {
@@ -309,17 +315,46 @@ export default function Dashboard() {
                 <>
                     <h1 className="text-2xl font-bold mb-6">{selectedStock} News</h1>
                     <div className="w-full">
-                        {newsItems.map((item, index) => (
-                            <div key={index} className="mb-4 p-4 border rounded-lg hover:bg-gray-50">
-                                <h2 className="text-lg font-semibold mb-1">{item.title}</h2>
-                                <p className="text-sm text-gray-600 mb-2">Source: {item.publisher}</p>
-                                <a href={item.url} target="_blank" rel="noopener noreferrer" 
-                                className="text-blue-600 hover:underline text-sm">
-                                    Read more
-                                </a>
-                                <p className="text-sm text-gray-600 mb-2">Score: {item.score}</p>
+                    <StockChart symbol={selectedStock} />
+                    {newsItems.map((item, index) => {
+                        const score = parseFloat(item.score);
+                        const formattedScore = score.toFixed(2);
+
+                        // Determine color class based on score range
+                        let scoreColorClass = "bg-gray-200 text-black"; // Neutral: -0.29 to 0.29
+
+                        if (score >= 0.7) {
+                            scoreColorClass = "bg-green-500 text-white"; // Strong positive: 0.7 to 1
+                        } else if (score >= 0.3) {
+                            scoreColorClass = "bg-green-200 text-black"; // Light positive: 0.3 to 0.69
+                        } else if (score <= -0.7) {
+                            scoreColorClass = "bg-red-500 text-white"; // Strong negative: -0.7 to -1
+                        } else if (score <= -0.3) {
+                            scoreColorClass = "bg-red-200 text-black"; // Light negative: -0.69 to -0.3
+                        }
+
+                        return (
+                            <div key={index} className="flex flex-col mb-4 p-4 border rounded-lg hover:bg-gray-50">
+                            <h2 className="text-lg font-semibold mb-1">{item.title}</h2>
+                            <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
+                                <p>Source: {item.publisher}</p>
+                                <div className={`px-2 py-1 rounded-md font-medium ${scoreColorClass}`}>
+                                Score: {formattedScore}
+                                </div>
                             </div>
-                        ))}
+                            <a
+                                href={item.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline text-sm"
+                            >
+                                Read more
+                            </a>
+                            </div>
+                        );
+                        })}
+
+
                     </div>
                 </>
             ) : (
