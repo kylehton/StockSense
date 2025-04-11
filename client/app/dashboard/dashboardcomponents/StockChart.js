@@ -6,6 +6,8 @@ const StockChart = ({ symbol }) => {
   const chartRef = useRef();
   const seriesRef = useRef();
   const [data, setData] = useState([]);
+  const [marketPrice, setMarketPrice] = useState(0)
+  const [prevClosing, setPrevClosing] = useState(0)
 
   const rapidAPIKey = process.env.NEXT_PUBLIC_RAPIDAPI_KEY;
 
@@ -25,6 +27,21 @@ const StockChart = ({ symbol }) => {
 
     const timestamps = data.chart.result[0].timestamp;
     const prices = data.chart.result[0].indicators.quote[0];
+    const currentPrice = data.chart.result[0].meta.regularMarketPrice;
+    const prevPrice = data.chart.result[0].meta.chartPreviousClose;
+    console.log("maybe closing:", prices.close[250])
+
+    setMarketPrice(currentPrice);
+    setPrevClosing(prevPrice);
+
+    const todaysDate = new Date();
+    const dateToCheck = new Date();
+    dateToCheck.setDate(todaysDate.getDate() - 1)
+    dateToCheck.setHours(16, 45, 0, 0)
+    const dateInUnix = Math.floor(dateToCheck/1000);
+    console.log(todaysDate)
+    console.log(dateToCheck)
+    console.log("Yest closing time:", dateInUnix)
 
     const formatted = timestamps.map((t, i) => ({
         time: t,
@@ -34,6 +51,8 @@ const StockChart = ({ symbol }) => {
         close: prices.close[i],
     }));
 
+    const closingPrice = (formatted.find(entry => entry.time === dateInUnix)).open; //yesterday's closing price
+    setPrevClosing(closingPrice)
     setData(formatted);
   };
 
@@ -45,11 +64,9 @@ const StockChart = ({ symbol }) => {
     console.log("Checking chart")
     if (!chartContainerRef.current || data.length === 0) return;
 
-    //if (chartRef.current) chartRef.current.remove(); // clean up old chart
-
     console.log("Creating chart for symbol:", symbol);
     chartRef.current = createChart(chartContainerRef.current, {
-      width: 350,
+      width: 600,
       height: 300,
       layout: {
         backgroundColor: '#000000',
@@ -67,10 +84,21 @@ const StockChart = ({ symbol }) => {
         mode: 1,
       },
     });
+    chartRef.current.timeScale().applyOptions({
+      fixLeftEdge: true,
+      fixRightEdge: true,
+      barSpacing: 5,
+      timeVisible: true,
+      rightOffset: 0
+    });
+    
 
     seriesRef.current = chartRef.current.addSeries(CandlestickSeries);
     console.log("Setting data for chart:", data);
     seriesRef.current.setData(data);
+    
+    
+    
 
     return () => {
       chartRef.current.remove(); // Cleanup on unmount
@@ -78,10 +106,15 @@ const StockChart = ({ symbol }) => {
   }, [data]);
 
   return (
-    <div
-      ref={chartContainerRef}
-      style={{ position: 'relative', width: '800px', height: '400px' }}
-    />
+    <div id="stock-chart-data-wrapper" className="flex flex-col">
+        <div id="stock-chart-container" ref={chartContainerRef}
+          style={{ position: 'relative', width: '600px' }}
+        />
+        <div id="stock-data-container" className="flex flex-col ml-2">
+            <p className="mb-2">Price: {marketPrice}</p>
+            <p className="mb-2">Prev. Closing: {prevClosing}</p>
+        </div>
+    </div>
   );
 };
 
