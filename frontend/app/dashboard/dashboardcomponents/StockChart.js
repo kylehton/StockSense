@@ -12,7 +12,7 @@ const StockChart = ({ symbol }) => {
   const getStockData = async () => {
     console.log("Fetching stock data for symbol:", symbol);
     const response = await fetch(
-      `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart?interval=1d&symbol=${symbol}&range=1mo&region=US`,
+      `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart?interval=15m&symbol=${symbol}&range=5d&region=US`,
       {
         method: 'GET',
         headers: {
@@ -27,7 +27,7 @@ const StockChart = ({ symbol }) => {
     const prices = data.chart.result[0].indicators.quote[0];
 
     const formatted = timestamps.map((t, i) => ({
-        time: new Date(t * 1000).toISOString().split('T')[0],
+        time: t,
         open: prices.open[i],
         high: prices.high[i],
         low: prices.low[i],
