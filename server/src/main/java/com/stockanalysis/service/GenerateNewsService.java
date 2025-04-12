@@ -13,6 +13,23 @@ import org.json.JSONObject;
 
 @Service
 public class GenerateNewsService {
+
+    double getBestSentimentScoreForTicker(JSONArray tickerArray, String stockSymbol) {
+        double bestScore = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < tickerArray.length(); i++) {
+            JSONObject tickerObj = tickerArray.getJSONObject(i);
+            if (tickerObj.getString("ticker").equalsIgnoreCase(stockSymbol)) {
+                double relevance = Double.parseDouble(tickerObj.getString("relevance_score"));
+                if (relevance >= 0.4) {
+                    double sentiment = tickerObj.getDouble("ticker_sentiment_score");
+                    bestScore = Math.max(bestScore, sentiment);
+                }
+            }
+        }
+        return bestScore;
+    }
+    
+    
     
     public String[][] generateNews(String stockSymbol) {
 
@@ -39,13 +56,23 @@ public class GenerateNewsService {
             // Loop through the news items and print title, publisher, and link
             // Store the first 5 items in newsInfo
             // Columns are: Article Title (0), Publisher (1), Link (2), Sentiment Score (3)
-            for (int i = 0; i < 5; i++) {
-                JSONObject newsItem = newsArray.getJSONObject(i);
-                newsInfo[0][i] = newsItem.getString("title");
-                newsInfo[1][i] = newsItem.getString("source");
-                newsInfo[2][i] = newsItem.getString("url");
-                newsInfo[3][i] = String.valueOf(newsItem.getDouble("overall_sentiment_score"));
+            int newsCount = 0;
+            int increment = 0;
+            while (newsCount < 5 && increment < newsArray.length()) {
+                JSONObject newsItem = newsArray.getJSONObject(increment);
+                System.out.println(newsItem);
+                // checks whether the article is truly about the stock symbol company, not just mentions it
+                JSONArray tickerArray = newsItem.getJSONArray("ticker_sentiment");
+                double score = getSentimentScoreForTicker(tickerArray, stockSymbol);
 
+                if (score >= 0.4) {
+                    newsInfo[0][newsCount] = newsItem.getString("title");
+                    newsInfo[1][newsCount] = newsItem.getString("source");
+                    newsInfo[2][newsCount] = newsItem.getString("url");
+                    newsInfo[3][newsCount] = String.valueOf(score);
+                    newsCount++;
+                }
+                increment++;
             }
             for (int x = 0; x < 5; x++) {
                 System.out.println("Title: " + newsInfo[0][x]);

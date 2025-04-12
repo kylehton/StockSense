@@ -91,14 +91,10 @@ const StockChart = ({ symbol }) => {
       timeVisible: true,
       rightOffset: 0
     });
-    
 
     seriesRef.current = chartRef.current.addSeries(CandlestickSeries);
     console.log("Setting data for chart:", data);
     seriesRef.current.setData(data);
-    
-    
-    
 
     return () => {
       chartRef.current.remove(); // Cleanup on unmount
