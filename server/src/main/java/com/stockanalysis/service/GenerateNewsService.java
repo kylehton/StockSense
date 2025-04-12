@@ -10,6 +10,10 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class GenerateNewsService {
@@ -29,10 +33,18 @@ public class GenerateNewsService {
         return bestScore;
     }
     
-    
+    // Add a method to get the relevance score for a ticker
+    double getRelevanceScoreForTicker(JSONArray tickerArray, String stockSymbol) {
+        for (int i = 0; i < tickerArray.length(); i++) {
+            JSONObject tickerObj = tickerArray.getJSONObject(i);
+            if (tickerObj.getString("ticker").equalsIgnoreCase(stockSymbol)) {
+                return Double.parseDouble(tickerObj.getString("relevance_score"));
+            }
+        }
+        return 0.0;
+    }
     
     public String[][] generateNews(String stockSymbol) {
-
         Dotenv dotenv = Dotenv.load();
 
         String[][] newsInfo = new String[4][5];
@@ -50,40 +62,72 @@ public class GenerateNewsService {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             JSONObject jsonResponse = new JSONObject(response.body());
 
-        // Extract the "news" array
+            // Extract the "news" array
             JSONArray newsArray = jsonResponse.getJSONArray("feed");
 
-            // Loop through the news items and print title, publisher, and link
-            // Store the first 5 items in newsInfo
-            // Columns are: Article Title (0), Publisher (1), Link (2), Sentiment Score (3)
-            int newsCount = 0;
-            int increment = 0;
-            while (newsCount < 5 && increment < newsArray.length()) {
-                JSONObject newsItem = newsArray.getJSONObject(increment);
-                System.out.println(newsItem);
-                // checks whether the article is truly about the stock symbol company, not just mentions it
-                JSONArray tickerArray = newsItem.getJSONArray("ticker_sentiment");
-                double score = getSentimentScoreForTicker(tickerArray, stockSymbol);
+            // Arrays to store the articles and their scores
+            List<JSONObject> articles = new ArrayList<>();
+            List<Double> relevanceScores = new ArrayList<>();
 
-                if (score >= 0.4) {
-                    newsInfo[0][newsCount] = newsItem.getString("title");
-                    newsInfo[1][newsCount] = newsItem.getString("source");
-                    newsInfo[2][newsCount] = newsItem.getString("url");
-                    newsInfo[3][newsCount] = String.valueOf(score);
-                    newsCount++;
+            // Loop through all news items and collect those relevant to the stock symbol
+            for (int i = 0; i < newsArray.length(); i++) {
+                JSONObject newsItem = newsArray.getJSONObject(i);
+                JSONArray tickerArray = newsItem.getJSONArray("ticker_sentiment");
+                
+                // Get the relevance score for this ticker
+                double relevanceScore = getRelevanceScoreForTicker(tickerArray, stockSymbol);
+                
+                if (relevanceScore >= 0.4) {
+                    articles.add(newsItem);
+                    relevanceScores.add(relevanceScore);
                 }
-                increment++;
             }
-            for (int x = 0; x < 5; x++) {
+            
+            // Create a list of indices to sort
+            List<Integer> indices = new ArrayList<>();
+            for (int i = 0; i < articles.size(); i++) {
+                indices.add(i);
+            }
+            
+            // Sort indices by relevance score (descending)
+            Collections.sort(indices, (a, b) -> Double.compare(relevanceScores.get(b), relevanceScores.get(a)));
+            
+            // Take the top 5 or fewer if less are available
+            int count = Math.min(5, articles.size());
+            
+            // Populate the newsInfo array with the top articles
+            for (int i = 0; i < count; i++) {
+                int index = indices.get(i);
+                JSONObject article = articles.get(index);
+                double sentimentScore = getBestSentimentScoreForTicker(article.getJSONArray("ticker_sentiment"), stockSymbol);
+                
+                newsInfo[0][i] = article.getString("title");
+                newsInfo[1][i] = article.getString("source");
+                newsInfo[2][i] = article.getString("url");
+                newsInfo[3][i] = String.valueOf(sentimentScore);
+            }
+            
+            // Fill remaining slots with null if less than 5 items
+            for (int i = count; i < 5; i++) {
+                newsInfo[0][i] = null;
+                newsInfo[1][i] = null;
+                newsInfo[2][i] = null;
+                newsInfo[3][i] = null;
+            }
+            
+            // Print the results
+            for (int x = 0; x < count; x++) {
                 System.out.println("Title: " + newsInfo[0][x]);
                 System.out.println("Source: " + newsInfo[1][x]);
                 System.out.println("Link: " + newsInfo[2][x]);
                 System.out.println("Sentiment Score: " + newsInfo[3][x]);
+                System.out.println("Relevance Score: " + relevanceScores.get(indices.get(x)));
             }
+            
             return newsInfo;
         } catch (Exception e) {
             e.printStackTrace();
-                throw new IllegalArgumentException("No API Response");
+            throw new IllegalArgumentException("No API Response");
         }
     }
 }
