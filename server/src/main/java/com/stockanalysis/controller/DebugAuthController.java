@@ -1,10 +1,12 @@
 package main.java.com.stockanalysis.controller;
 
+import org.springframework.security.web.csrf.CsrfToken;
+
 import java.util.Map;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @RequestMapping("/debug")
