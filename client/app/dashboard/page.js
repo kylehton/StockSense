@@ -24,12 +24,10 @@ export default function Dashboard() {
     const [selectedStock, setSelectedStock] = useState("");
     const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
-    let xsrfTokenCache = null;
-
     const getXSRFToken = async () => {
       // Return cached token if available
-      try{
-      if (xsrfTokenCache) return xsrfTokenCache;
+      try {
+      
 
       const res = await fetch(`${SERVER_URL}xsrf`, {
           method: 'GET',
@@ -44,15 +42,14 @@ export default function Dashboard() {
       if (cookieMatch) {
           xsrfTokenCache = decodeURIComponent(cookieMatch[1]);
           console.log("✅ XSRF token from cookie:", xsrfTokenCache);
-          return xsrfTokenCache;
       }
 
       // Fallback: read from response JSON
       const data = await res.text();
       if (data.token) {
-          xsrfTokenCache = data.token;
-          console.log("✅ XSRF token from JSON:", xsrfTokenCache);
-          return xsrfTokenCache;
+          const xsrf = data.token;
+          console.log("✅ XSRF token from JSON:", xsrf);
+          return xsrf;
       }
       } catch (error) {
         throw new Error("❌ Failed to retrieve CSRF token:", error);
