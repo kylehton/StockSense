@@ -111,15 +111,25 @@ public class WebSecurityConfig {
             }, UsernamePasswordAuthenticationFilter.class)
             
             .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) -> {
-                    String requestPath = request.getServletPath();
-                    if (requestPath.matches("/xsrf|/google/auth|/db/check|/debug/auth|/getsession|/db/getsymbols")) {
-                        response.setStatus(HttpStatus.OK.value());
-                        return;
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    logger.error("Access Denied on {} {} - Reason: {}", request.getMethod(), request.getRequestURI(), accessDeniedException.getMessage());
+
+                    HttpSession session = request.getSession(false);
+                    if (session != null) {
+                        Object userId = session.getAttribute("USER_ID");
+                        Object csrfToken = session.getAttribute("org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository.CSRF_TOKEN");
+                        logger.debug("Session ID: {}", session.getId());
+                        logger.debug("USER_ID: {}", userId != null ? userId.toString() : "null");
+                        logger.debug("CSRF Token (session): {}", csrfToken != null ? csrfToken.toString() : "null");
+                    } else {
+                        logger.debug("No session present during access denied.");
                     }
-                    logger.error("Auth error for {}: {}", request.getRequestURI(), authException.getMessage());
-                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    response.getWriter().write("Authentication required");
+
+                    String csrfHeader = request.getHeader("X-XSRF-TOKEN");
+                    logger.debug("CSRF Token (header): {}", csrfHeader != null ? csrfHeader : "null");
+
+                    response.setStatus(HttpStatus.FORBIDDEN.value());
+                    response.getWriter().write("CSRF verification failed or access denied.");
                 })
             );
 
