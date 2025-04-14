@@ -15,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -91,9 +90,10 @@ public class WebSecurityConfig {
                         Object userId = session.getAttribute("USER_ID");
                         String csrfToken = (String) session.getAttribute("org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository.CSRF_TOKEN");
             
-                        logger.debug("Session ID: {}", session.getId());
-                        logger.debug("USER_ID from session: {}", userId);
-                        logger.debug("CSRF token in session: {}", csrfToken);
+                        // Fixed the problematic debug statements by using string concatenation
+                        logger.debug("Session ID: " + session.getId());
+                        logger.debug("USER_ID from session: " + userId);
+                        logger.debug("CSRF token in session: " + csrfToken);
             
                         Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
                         if (userId != null && (currentAuth == null || !currentAuth.isAuthenticated())) {
@@ -119,14 +119,16 @@ public class WebSecurityConfig {
                         return;
                     }
 
-                    // The fix is here:
-                    logger.error("Auth error for {}: {}", request.getRequestURI(), authException.getMessage()); 
+                    // Use simple logging approach to avoid issues
+                    logger.error("Auth error: " + authException.getMessage());
+                    
                     try {
                         HttpSession session = request.getSession(false);
                         if (session != null) {
                             Object userId = session.getAttribute("USER_ID");
                             Object csrfToken = session.getAttribute("org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository.CSRF_TOKEN");
 
+                            // Use string concatenation to avoid method signature issues
                             logger.info("Session ID: " + session.getId());
                             logger.info("USER_ID: " + (userId != null ? userId.toString() : "null"));
                             logger.info("CSRF Token (session): " + (csrfToken != null ? csrfToken.toString() : "null"));
