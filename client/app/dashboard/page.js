@@ -24,35 +24,39 @@ export default function Dashboard() {
     const [selectedStock, setSelectedStock] = useState("");
     const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
-    let xsrfToken = null;
-
-    const fetchAndCacheXsrf = async () => {
-        const res = await fetch(`${SERVER_URL}xsrf`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-      
-        await new Promise(resolve => setTimeout(resolve, 100)); // 🔁 allow cookie to sync
-      
-        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-        if (match) {
-          xsrfTokenCache = decodeURIComponent(match[1]);
-          console.log("🔐 CSRF token cached:", xsrfTokenCache);
-        } else {
-          console.warn("⚠️ CSRF cookie not found after /xsrf fetch");
-        }
-      };      
-    
+    let xsrfTokenCache = null;
 
     const getXSRFToken = async () => {
-        const res = await fetch(`${SERVER_URL}xsrf`, {
-            method: 'GET',
-            credentials: 'include',
-        });
-        const data = await res.json();
-        await new Promise(resolve => setTimeout(resolve, 50));
-        return data.token;
-    };
+    // Return cached token if available
+    if (xsrfTokenCache) return xsrfTokenCache;
+
+    const res = await fetch(`${SERVER_URL}xsrf`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    // Wait briefly to allow cookie sync across sites
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Try reading from cookie
+    const cookieMatch = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+    if (cookieMatch) {
+        xsrfTokenCache = decodeURIComponent(cookieMatch[1]);
+        console.log("✅ XSRF token from cookie:", xsrfTokenCache);
+        return xsrfTokenCache;
+    }
+
+    // Fallback: read from response JSON
+    const data = await res.json();
+    if (data.token) {
+        xsrfTokenCache = data.token;
+        console.log("✅ XSRF token from JSON:", xsrfTokenCache);
+        return xsrfTokenCache;
+    }
+
+    throw new Error("❌ Failed to retrieve CSRF token");
+    };      
+    
 
     const debugSession = async () => {
         const res = await fetch(`${SERVER_URL}debug/session`, {
@@ -212,19 +216,17 @@ export default function Dashboard() {
 
     useEffect(() => {
         async function initialize() {
-          await debugSession(); // Confirm session is active
-          await fetchAndCacheXsrf();
-          await debugSession();
+          await debugSession(); // See current session
+          await getXSRFToken(); // This will set cookie + cache the token
+          await debugSession(); // Optional second check
       
           const userExists = await checkUser();
-          if (!userExists) await addUser(); // 🔐 Will now include valid token
+          if (!userExists) await addUser(); // Safe CSRF protected
           await loadWatchlist();
         }
       
         initialize();
-      }, []);
-
-    // render remains unchanged
+      }, []);      
 
 
   return (
