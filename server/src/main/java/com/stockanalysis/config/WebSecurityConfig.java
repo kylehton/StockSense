@@ -119,23 +119,23 @@ public class WebSecurityConfig {
                         return;
                     }
 
-                    // ✅ Fix starts here:
-                    logger.error("Auth error for {}: {}", request.getRequestURI(), authException.getMessage()); // good
+                    // The fix is here:
+                    logger.error("Auth error for {}: {}", request.getRequestURI(), authException.getMessage()); 
                     try {
                         HttpSession session = request.getSession(false);
                         if (session != null) {
                             Object userId = session.getAttribute("USER_ID");
                             Object csrfToken = session.getAttribute("org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository.CSRF_TOKEN");
 
-                            logger.info("Session ID: {}", session.getId());
-                            logger.info("USER_ID: {}", userId != null ? userId.toString() : "null");
-                            logger.info("CSRF Token (session): {}", csrfToken != null ? csrfToken.toString() : "null");
+                            logger.info("Session ID: " + session.getId());
+                            logger.info("USER_ID: " + (userId != null ? userId.toString() : "null"));
+                            logger.info("CSRF Token (session): " + (csrfToken != null ? csrfToken.toString() : "null"));
                         } else {
                             logger.info("No session present during authentication failure.");
                         }
 
                         String csrfHeader = request.getHeader("X-XSRF-TOKEN");
-                        logger.info("CSRF Token (header): {}", csrfHeader != null ? csrfHeader : "null");
+                        logger.info("CSRF Token (header): " + (csrfHeader != null ? csrfHeader : "null"));
                     } catch (Exception e) {
                         logger.error("Failed to log session/csrf debugging", e);
                     }
@@ -144,7 +144,6 @@ public class WebSecurityConfig {
                     response.getWriter().write("Authentication required");
                 })
             );
-
 
         logger.info("Security filter chain configured successfully");
         return http.build();
