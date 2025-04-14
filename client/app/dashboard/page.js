@@ -27,34 +27,34 @@ export default function Dashboard() {
     let xsrfTokenCache = null;
 
     const getXSRFToken = async () => {
-    // Return cached token if available
-    if (xsrfTokenCache) return xsrfTokenCache;
+      // Return cached token if available
+      if (xsrfTokenCache) return xsrfTokenCache;
 
-    const res = await fetch(`${SERVER_URL}xsrf`, {
-        method: 'GET',
-        credentials: 'include',
-    });
+      const res = await fetch(`${SERVER_URL}xsrf`, {
+          method: 'GET',
+          credentials: 'include',
+      });
 
-    // Wait briefly to allow cookie sync across sites
-    await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait briefly to allow cookie sync across sites
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Try reading from cookie
-    const cookieMatch = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-    if (cookieMatch) {
-        xsrfTokenCache = decodeURIComponent(cookieMatch[1]);
-        console.log("✅ XSRF token from cookie:", xsrfTokenCache);
-        return xsrfTokenCache;
-    }
+      // Try reading from cookie
+      const cookieMatch = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+      if (cookieMatch) {
+          xsrfTokenCache = decodeURIComponent(cookieMatch[1]);
+          console.log("✅ XSRF token from cookie:", xsrfTokenCache);
+          return xsrfTokenCache;
+      }
 
-    // Fallback: read from response JSON
-    const data = await res.json();
-    if (data.token) {
-        xsrfTokenCache = data.token;
-        console.log("✅ XSRF token from JSON:", xsrfTokenCache);
-        return xsrfTokenCache;
-    }
+      // Fallback: read from response JSON
+      const data = await res.text();
+      if (data.token) {
+          xsrfTokenCache = data.token;
+          console.log("✅ XSRF token from JSON:", xsrfTokenCache);
+          return xsrfTokenCache;
+      }
 
-    throw new Error("❌ Failed to retrieve CSRF token");
+      throw new Error("❌ Failed to retrieve CSRF token");
     };      
     
 
@@ -118,7 +118,7 @@ export default function Dashboard() {
             }
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        return await response.json();
+        return await response.text();
     }
 
     async function loadWatchlist() {
@@ -218,7 +218,6 @@ export default function Dashboard() {
         async function initialize() {
           await debugSession(); // See current session
           await getXSRFToken(); // This will set cookie + cache the token
-          await debugSession(); // Optional second check
       
           const userExists = await checkUser();
           if (!userExists) await addUser(); // Safe CSRF protected
