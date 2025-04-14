@@ -57,8 +57,14 @@ public class DBController {
 
     @GetMapping("/check")
     public Boolean checkUser(HttpSession session) {
-        String google_id = session.getAttribute("USER_ID").toString();
-        return dbService.checkUserExists(google_id, this.stmt);
+        try {
+            String google_id = session.getAttribute("USER_ID").toString();
+            return dbService.checkUserExists(google_id, this.stmt);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        
     }
 
     @PostMapping("/adduser")

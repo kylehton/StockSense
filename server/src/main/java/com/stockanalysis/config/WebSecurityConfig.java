@@ -66,7 +66,7 @@ public class WebSecurityConfig {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                .ignoringRequestMatchers("/xsrf", "/google/auth", "/db/check", "/debug/auth", "/getsession", "/db/getsymbols")
+                .ignoringRequestMatchers("/xsrf", "/google/auth", "/db/check", "/db/testdb", "/getsession", "/db/getsymbols")
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Enforce stateless session
