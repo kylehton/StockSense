@@ -14,14 +14,14 @@ const StockChart = ({ symbol }) => {
   const getStockData = async () => {
     console.log("Fetching stock data for symbol:", symbol);
     const response = await fetch(
-      `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart?interval=15m&symbol=${symbol}&range=5d&region=US`,
-      {
-        method: 'GET',
-        headers: {
-          'X-RapidAPI-Key': rapidAPIKey,
-          'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
-        },
-      }
+        `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart?interval=15m&symbol=${symbol}&range=5d&region=US`,
+        {
+            method: 'GET',
+            headers: {
+              'X-RapidAPI-Key': rapidAPIKey,
+              'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
+            },
+        }
     );
     const data = await response.json();
 

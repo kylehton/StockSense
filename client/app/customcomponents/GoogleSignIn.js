@@ -2,6 +2,8 @@
 import dotenv from "dotenv";
 import { useEffect } from "react";
 import { useRouter } from 'next/navigation';  
+dotenv.config();
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
 const GoogleSignIn = () => {
     dotenv.config();
@@ -45,7 +47,7 @@ const GoogleSignIn = () => {
     
     async function getXSRFToken() {
       try {
-          const xsrfToken = await fetch('http://localhost:8080/xsrf', {
+          const xsrfToken = await fetch(`${SERVER_URL}xsrf`, {
               method: 'GET',
               credentials: 'include',
               headers: {
@@ -67,7 +69,7 @@ const GoogleSignIn = () => {
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
         
 
-        const res = await fetch(`http://localhost:8080/google/auth?id=${response.credential}`, {
+        const res = await fetch(`https://stocksense-server.up.railway.app/google/auth?id=${response.credential}`, {
           method: "POST",
           credentials: "include", 
           headers: {
