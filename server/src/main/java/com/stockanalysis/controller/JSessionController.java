@@ -13,6 +13,6 @@ public class JSessionController {
     @GetMapping("/getsession")
     public ResponseEntity<String> getSession(HttpSession session)
     {
-        return ResponseEntity.ok().body((session.getId()));
+        return ResponseEntity.ok().body((session.getId() + " - " + session.getAttribute("USER_ID")));
     }
 }
