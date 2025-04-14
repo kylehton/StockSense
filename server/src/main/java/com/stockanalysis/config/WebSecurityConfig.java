@@ -59,11 +59,14 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         logger.info("Configuring security filter chain...");
+        CookieCsrfTokenRepository tokenRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+            tokenRepo.setCookieName("XSRF-TOKEN");
+            tokenRepo.setHeaderName("X-XSRF-TOKEN");
 
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRepository(tokenRepo)
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 .ignoringRequestMatchers("/xsrf", "/google/auth", "/db/check", "/debug/session", "/db/testdb", "/getsession", "/db/getsymbols")
             )
