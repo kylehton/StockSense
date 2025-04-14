@@ -44,6 +44,11 @@ const GoogleSignIn = () => {
       };
 
     }, [clientID]);
+
+    const getXSRFTokenFromCookie = async ()  => {
+      const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+      return match ? decodeURIComponent(match[1]) : null;
+    }
     
     async function getXSRFToken() {
       try {
@@ -64,7 +69,8 @@ const GoogleSignIn = () => {
   
     const handleCredentialResponse = async (response) => {
       if (response.credential) {
-        const xsrf = await getXSRFToken();
+        //const xsrf = await getXSRFToken();
+        const xsrf = await getXSRFTokenFromCookie();
         //response.credential is the JWT token for the authenticated user
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
         
