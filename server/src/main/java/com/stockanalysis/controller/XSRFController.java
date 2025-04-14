@@ -15,10 +15,6 @@ import java.util.Map;
 @RequestMapping
 public class XSRFController {
 
-    @RestController
-@RequestMapping
-public class XSRFController {
-
     @GetMapping("/xsrf")
     public ResponseEntity<Map<String, String>> getXsrfToken(HttpServletRequest request) {
         CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
@@ -35,4 +31,3 @@ public class XSRFController {
     }
 }
 
-}
