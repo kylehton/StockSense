@@ -78,7 +78,9 @@ const GoogleSignIn = () => {
           },
         })
         if (res.ok) {
-          router.push('/dashboard');
+          await res.json();
+          if (res.ok)
+            router.push('/dashboard');
         }
         else {
           alert("Failed to authenticate Google account. Please try again.");
