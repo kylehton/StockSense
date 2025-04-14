@@ -69,7 +69,7 @@ public class WebSecurityConfig {
                 .ignoringRequestMatchers("/xsrf", "/google/auth", "/db/check", "/debug/auth", "/getsession", "/db/getsymbols")
             )
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Enforce stateless session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Enforce stateless session
             )
             .authorizeHttpRequests(auth -> {
                 logger.debug("Configuring authorization rules...");

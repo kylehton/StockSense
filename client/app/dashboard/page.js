@@ -66,6 +66,7 @@ export default function Dashboard() {
 
     const handleDeleteSymbol = async (stockSymbol) => {
         const xsrfToken = await getXSRFToken();
+        console.log("XSRF Token:", xsrfToken);
         console.log("Deleting symbol:", stockSymbol);
         const response = await fetch(`http://localhost:8080/db/deletesymbol?symbol=${stockSymbol}`, {
             method: 'DELETE',
