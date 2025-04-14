@@ -23,6 +23,8 @@ export default function Dashboard() {
     const [newsItems, setNewsItems] = useState([]);
     const [selectedStock, setSelectedStock] = useState("");
     const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+
+    let xsrfToken = null;
     
 
     const getXSRFToken = async () => {
@@ -193,13 +195,30 @@ export default function Dashboard() {
 
     useEffect(() => {
         async function initialize() {
-            await debugSession();
-            const userExists = await checkUser();
-            if (!userExists) await addUser();
-            await loadWatchlist();
+          await debugSession(); // Confirm session is active
+      
+          // ✅ Get CSRF token from `/xsrf`, which sets it in both response and cookie
+          const xsrf = await getXSRFToken();
+      
+          // ✅ Wait briefly for Set-Cookie to sync
+          await new Promise((resolve) => setTimeout(resolve, 100));
+      
+          // ✅ Read XSRF-TOKEN from cookie (now guaranteed to exist)
+          const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+          if (match) {
+            xsrfToken = decodeURIComponent(match[1]);
+          }
+      
+          console.log("🧪 CSRF Token (header):", xsrfToken);
+          await debugSession();
+      
+          const userExists = await checkUser();
+          if (!userExists) await addUser(); // 🔐 Will now include valid token
+          await loadWatchlist();
         }
+      
         initialize();
-    }, []);
+      }, []);
 
     // render remains unchanged
 
