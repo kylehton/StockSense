@@ -75,7 +75,7 @@ public class WebSecurityConfig {
                 logger.debug("Configuring authorization rules...");
                 auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow CORS preflight requests
-                    .requestMatchers("/xsrf", "/google/auth", "/db/check", "/debug/auth").permitAll()
+                    .requestMatchers("/xsrf", "/google/auth", "/db/check", "/debug/auth", "/error").permitAll()
                     .requestMatchers("/getsession", "/db/getsymbols").permitAll()
                     .requestMatchers("/db/addsymbol", "/db/deletesymbol", "/db/adduser", "/news/generate", "/news/get",
                                      "/s3/retrieve", "/db/setnewskey", "/db/getnewskey").hasAuthority("USER")
