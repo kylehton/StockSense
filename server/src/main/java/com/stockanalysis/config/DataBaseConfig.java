@@ -16,8 +16,6 @@ public class DataBaseConfig {
     
     public Statement dbStatement() {
 
-        Dotenv dotenv = Dotenv.load();
-
         @Value("${DB_URL}")
         String url;
 
