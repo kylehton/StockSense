@@ -69,7 +69,7 @@ const GoogleSignIn = () => {
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
         
 
-        const res = await fetch(`${SERVER_URL}/google/auth?id=${response.credential}`, {
+        const res = await fetch(`${SERVER_URL}google/auth?id=${response.credential}`, {
           method: "POST",
           credentials: "include", 
           headers: {

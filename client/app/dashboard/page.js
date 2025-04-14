@@ -34,7 +34,7 @@ export default function Dashboard() {
     const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
     const getXSRFToken = async () => {
-        const xsrfToken = await fetch('${SERVER_URL}xsrf', {
+        const xsrfToken = await fetch(`${SERVER_URL}xsrf`, {
             method: 'GET',
             credentials: 'include',
         })
