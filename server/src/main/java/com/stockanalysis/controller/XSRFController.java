@@ -23,7 +23,7 @@ public class XSRFController {
             return ResponseEntity.badRequest().body(Map.of("error", "XSRF token not found"));
         }
 
-        CsrfToken token = csrfToken.getToken(); // ✅ Force generation and session storage
+        String token = csrfToken.getToken(); // ✅ Force generation and session storage
         System.out.println("Backend-generated XSRF Token: " + token);
 
         return ResponseEntity.ok()
