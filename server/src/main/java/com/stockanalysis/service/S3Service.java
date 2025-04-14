@@ -27,9 +27,8 @@ public class S3Service {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public S3Service(AWSConfig awsConfig) {
-        // Load environment variables using dotenv if not already set
-        this.s3Client = awsConfig.buildS3Client();
+    public S3Service(S3Client s3Client, AWSConfig awsConfig) {
+        this.s3Client = s3Client;
         this.bucketName = awsConfig.getBucketName();
         this.objectMapper = new ObjectMapper();
     }

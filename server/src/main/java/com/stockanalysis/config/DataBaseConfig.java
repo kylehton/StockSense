@@ -2,11 +2,12 @@ package com.stockanalysis.config;
 
 import org.springframework.context.annotation.Configuration;
 
-import io.github.cdimascio.dotenv.Dotenv;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 public class DataBaseConfig {
@@ -17,9 +18,14 @@ public class DataBaseConfig {
 
         Dotenv dotenv = Dotenv.load();
 
-        String url = dotenv.get("DB_URL");
-        String user = dotenv.get("DB_USER");
-        String password = dotenv.get("DB_PASSWORD");
+        @Value("${DB_URL}")
+        String url;
+
+        @Value("${DB_USER}")
+        String user;
+
+        @Value("${DB_PASSWORD}")
+        String password;
 
      
             // Connect to the PostgreSQL database

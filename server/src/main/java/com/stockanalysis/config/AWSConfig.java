@@ -1,14 +1,14 @@
 package com.stockanalysis.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
+import jakarta.annotation.PostConstruct;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import org.springframework.beans.factory.annotation.Value;
-import javax.annotation.PostConstruct;
 
 @Configuration
 public class AWSConfig {
@@ -35,18 +35,17 @@ public class AWSConfig {
         System.out.println("===== AWS CONFIG END =====");
     }
 
-
-    public AWSConfig() {
-
-    }
-
-    public S3Client buildS3Client() {
+    @Bean
+    public S3Client s3Client() {
         return S3Client.builder()
                 .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
+                .credentialsProvider(
+                        StaticCredentialsProvider.create(
+                                AwsBasicCredentials.create(accessKey, secretKey)
+                        )
+                )
                 .build();
     }
-
 
     public String getBucketName() {
         return bucketName;

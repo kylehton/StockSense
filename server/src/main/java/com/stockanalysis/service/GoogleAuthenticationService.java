@@ -1,6 +1,7 @@
 package com.stockanalysis.service;
 
-import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.beans.factory.annotation.Value;
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -13,13 +14,14 @@ import java.util.Arrays;
 @Service
 public class GoogleAuthenticationService {
 
+    @Value("${GOOGLE_CLIENT_ID}")
+
     private String client_id;
     private NetHttpTransport transport;
     private GsonFactory gsonFactory;
 
     public GoogleAuthenticationService() {
-        Dotenv dotenv = Dotenv.load();
-        this.client_id = dotenv.get("GOOGLE_CLIENT_ID");
+
         this.transport = new NetHttpTransport();
         this.gsonFactory = GsonFactory.getDefaultInstance();
     }
