@@ -210,17 +210,23 @@ export default function Dashboard() {
 
     useEffect(() => {
         async function initialize() {
-
-            await debugSession();         // confirms session
-            await getXSRFToken();         // triggers token creation in backend
-            await new Promise(r => setTimeout(r, 250));
-
+            await debugSession(); // Check session is authenticated
+            await fetch(`${SERVER_URL}xsrf`, { credentials: 'include' }); // trigger CSRF token to be regenerated
+            await new Promise(resolve => setTimeout(resolve, 50)); // allow cookie to sync
+    
+            const tokenFromCookie = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+            if (tokenFromCookie) {
+                xsrfTokenCache = decodeURIComponent(tokenFromCookie[1]); // now cache it properly
+            }
+    
+            await debugSession(); // confirm it's in session
             const userExists = await checkUser();
             if (!userExists) await addUser();
             await loadWatchlist();
         }
         initialize();
     }, []);
+    
 
     return (
         <div id="page-wrapper" className="text-zinc-800 flex h-screen w-full items-center justify-between">
