@@ -28,6 +28,7 @@ export default function Dashboard() {
 
     const getXSRFToken = async () => {
       // Return cached token if available
+      try{
       if (xsrfTokenCache) return xsrfTokenCache;
 
       const res = await fetch(`${SERVER_URL}xsrf`, {
@@ -53,8 +54,9 @@ export default function Dashboard() {
           console.log("✅ XSRF token from JSON:", xsrfTokenCache);
           return xsrfTokenCache;
       }
-
-      throw new Error("❌ Failed to retrieve CSRF token");
+      } catch (error) {
+        throw new Error("❌ Failed to retrieve CSRF token:", error);
+      }
     };      
     
 
