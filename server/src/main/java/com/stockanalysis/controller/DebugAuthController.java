@@ -1,4 +1,4 @@
-package main.java.com.stockanalysis.controller;
+package com.stockanalysis.controller;
 
 import org.springframework.security.web.csrf.CsrfToken;
 
