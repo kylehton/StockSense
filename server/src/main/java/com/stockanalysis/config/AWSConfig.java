@@ -16,7 +16,7 @@ public class AWSConfig {
     @Value("${AWS_BUCKET_NAME}")
     private String bucketName;
 
-    @Value("${AWS_ACCESS_KEY_ID}")
+    @Value("${AWS_ACCESS_KEY}")
     private String accessKey;
 
     @Value("${AWS_SECRET_ACCESS_KEY}")
