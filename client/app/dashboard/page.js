@@ -114,12 +114,13 @@ export default function Dashboard() {
 
     async function addUser() {
             const xsrfToken = await getXSRFToken();
+            const clientToken = getCookie('XSRF-TOKEN');
             console.log("User does not exist, creating new user.")
             const response = await fetch(`${SERVER_URL}db/adduser`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                    'X-XSRF-TOKEN': xsrfToken,
+                    'X-XSRF-TOKEN': `${clientToken}`,
                     'Content-Type': 'application/json',
                 }
             });
