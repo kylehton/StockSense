@@ -14,7 +14,7 @@ public class DataBaseConfig {
 
     private Connection conn;
 
-    @Value("${DB_URL}")
+    @Value("${DATABASE_URL}")
     private String url;
 
     @Value("${DB_USER}")
