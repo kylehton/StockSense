@@ -40,6 +40,7 @@ export default function Dashboard() {
         });
         const data = await res.json();
         xsrfTokenCache = data.token;
+        await new Promise(resolve => setTimeout(resolve, 50)); // short delay to allow browser to sync cookie
         return data.token;
     };
 
