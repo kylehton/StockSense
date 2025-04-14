@@ -32,9 +32,9 @@ public class GoogleAuthenticationController {
             GoogleIdToken.Payload payload = googleAuthenticationService.authenticate(id);
             String userId = payload.getSubject();
             
-            System.out.println("Authenticating and storing user: " + session.getAttribute("email"));
             session.setAttribute("USER_ID", userId);
             session.setAttribute("email", payload.get("email"));
+            System.out.println("Authenticating and storing user: " + session.getAttribute("email"));
 
             return ResponseEntity.ok().body("Authenticated user: " + payload.get("email"));
         } catch (IOException e) {
