@@ -61,19 +61,19 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         logger.info("Configuring security filter chain...");
 
-        CookieCsrfTokenRepository tokenRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        tokenRepo.setCookieName("XSRF-TOKEN");
-        tokenRepo.setHeaderName("X-XSRF-TOKEN");
+        CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repo.setCookieCustomizer(builder -> builder.sameSite("None"));
 
-        // ✅ Replace this handler
-        XorCsrfTokenRequestAttributeHandler requestHandler = new XorCsrfTokenRequestAttributeHandler();
-        requestHandler.setCsrfRequestAttributeName("_csrf");
+
+        XorCsrfTokenRequestAttributeHandler xorHandler = new XorCsrfTokenRequestAttributeHandler();
+        xorHandler.setCsrfRequestAttributeName("_csrf");
+
 
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
-                .csrfTokenRepository(tokenRepo)
-                .csrfTokenRequestHandler(requestHandler) // ✅ here
+                .csrfTokenRepository(repo)
+                .csrfTokenRequestHandler(xorHandler)
                 .ignoringRequestMatchers("/xsrf", "/google/auth", "/db/check", "/debug/session", "/db/testdb", "/getsession", "/db/getsymbols")
             )
             .sessionManagement(session -> session
@@ -97,12 +97,10 @@ public class WebSecurityConfig {
             
                     if (session != null) {
                         Object userId = session.getAttribute("USER_ID");
-                        String csrfToken = (String) session.getAttribute("org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository.CSRF_TOKEN");
             
                         // Fixed the problematic debug statements by using string concatenation
                         logger.debug("Session ID: " + session.getId());
                         logger.debug("USER_ID from session: " + userId);
-                        logger.debug("CSRF token in session: " + csrfToken);
             
                         Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
                         if (userId != null && (currentAuth == null || !currentAuth.isAuthenticated())) {
