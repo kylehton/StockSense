@@ -111,32 +111,40 @@ public class WebSecurityConfig {
             }, UsernamePasswordAuthenticationFilter.class)
             
             .exceptionHandling(ex -> ex
-                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    logger.error("Access Denied on {} {} - {}", request.getMethod(), request.getRequestURI(), accessDeniedException.getMessage());
-                
+                .authenticationEntryPoint((request, response, authException) -> {
+                    String requestPath = request.getServletPath();
+
+                    if (requestPath.matches("/xsrf|/google/auth|/db/check|/debug/auth|/getsession|/db/getsymbols")) {
+                        response.setStatus(HttpStatus.OK.value());
+                        return;
+                    }
+
+                    // ✅ Fix starts here:
+                    logger.error("Auth error for {}: {}", request.getRequestURI(), authException.getMessage()); // good
                     try {
                         HttpSession session = request.getSession(false);
                         if (session != null) {
                             Object userId = session.getAttribute("USER_ID");
                             Object csrfToken = session.getAttribute("org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository.CSRF_TOKEN");
-                
+
                             logger.info("Session ID: {}", session.getId());
                             logger.info("USER_ID: {}", userId != null ? userId.toString() : "null");
                             logger.info("CSRF Token (session): {}", csrfToken != null ? csrfToken.toString() : "null");
                         } else {
-                            logger.info("No session present during access denied.");
+                            logger.info("No session present during authentication failure.");
                         }
-                
+
                         String csrfHeader = request.getHeader("X-XSRF-TOKEN");
                         logger.info("CSRF Token (header): {}", csrfHeader != null ? csrfHeader : "null");
-                
-                        response.setStatus(HttpStatus.FORBIDDEN.value());
-                        response.getWriter().write("CSRF verification failed or access denied.");
                     } catch (Exception e) {
-                        logger.error("Failed to log CSRF debug info", e);
+                        logger.error("Failed to log session/csrf debugging", e);
                     }
+
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.getWriter().write("Authentication required");
                 })
             );
+
 
         logger.info("Security filter chain configured successfully");
         return http.build();
