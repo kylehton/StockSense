@@ -209,10 +209,13 @@ export default function Dashboard() {
 
     useEffect(() => {
         async function initialize() {
-            await debugSession(); //  check session + csrf on first call
+
+            await debugSession();         // confirms session
+            await getXSRFToken();         // triggers token creation in backend
+            await new Promise(r => setTimeout(r, 250));
+
             const userExists = await checkUser();
             if (!userExists) await addUser();
-            await getXSRFTokenFromCookie(); // set + cache it only once after session stabilized
             await loadWatchlist();
         }
         initialize();
