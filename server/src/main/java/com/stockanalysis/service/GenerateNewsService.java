@@ -18,6 +18,9 @@ import java.util.List;
 @Service
 public class GenerateNewsService {
 
+    @Value("${AV_API_KEY}")
+    private String api_key;
+
     double getBestSentimentScoreForTicker(JSONArray tickerArray, String stockSymbol) {
         double bestScore = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < tickerArray.length(); i++) {
@@ -48,8 +51,7 @@ public class GenerateNewsService {
 
         String[][] newsInfo = new String[4][5];
 
-        @Value("${AV_API_KEY}")
-        String api_key;
+        
         // Alpha Vantage API URL
         String apiCallURL = "https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=" + stockSymbol + "&apikey=" + api_key;
                         

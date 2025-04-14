@@ -12,18 +12,18 @@ import org.springframework.beans.factory.annotation.Value;
 @Configuration
 public class DataBaseConfig {
 
-    Connection conn;
+    private Connection conn;
+
+    @Value("${DB_URL}")
+    private String url;
+
+    @Value("${DB_USER}")
+    private String user;
+
+    @Value("${DB_PASSWORD}")
+    private String password;
     
     public Statement dbStatement() {
-
-        @Value("${DB_URL}")
-        String url;
-
-        @Value("${DB_USER}")
-        String user;
-
-        @Value("${DB_PASSWORD}")
-        String password;
 
      
             // Connect to the PostgreSQL database
