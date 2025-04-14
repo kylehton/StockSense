@@ -27,6 +27,8 @@ export default function Dashboard() {
     // Cache for CSRF token
     let xsrfTokenCache = null;
 
+    const xsrfToken = "";
+
     const getXSRFTokenFromCookie = async ()  => {
         const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
         return match ? decodeURIComponent(match[1]) : null;
@@ -54,7 +56,6 @@ export default function Dashboard() {
     };
 
     const handleAddSymbol = async () => {
-        const xsrfToken = await getXSRFTokenFromCookie();
         const response = await fetch(`${SERVER_URL}db/addsymbol?symbol=${symbol}`, {
             method: 'POST',
             credentials: 'include',
@@ -74,7 +75,6 @@ export default function Dashboard() {
     };
 
     const handleDeleteSymbol = async (stockSymbol) => {
-        const xsrfToken = await getXSRFTokenFromCookie();
         const response = await fetch(`${SERVER_URL}db/deletesymbol?symbol=${stockSymbol}`, {
             method: 'DELETE',
             credentials: 'include',
@@ -102,7 +102,6 @@ export default function Dashboard() {
     }
 
     async function addUser() {
-        const xsrfToken = await getXSRFTokenFromCookie();
         const response = await fetch(`${SERVER_URL}db/adduser`, {
             method: 'POST',
             credentials: 'include',
@@ -127,7 +126,6 @@ export default function Dashboard() {
     }
 
     const setNewsKey = async (stockSymbol, key) => {
-        const xsrfToken = await getXSRFTokenFromCookie();
         const response = await fetch(`${SERVER_URL}db/setnewskey?symbol=${stockSymbol}&key=${key}`, {
             method: 'POST',
             credentials: 'include',
@@ -141,7 +139,6 @@ export default function Dashboard() {
     };
 
     const fetchNewsKey = async (stockSymbol) => {
-        const xsrfToken = await getXSRFTokenFromCookie();
         const response = await fetch(`${SERVER_URL}db/getnewskey?symbol=${stockSymbol}`, {
             method: 'GET',
             credentials: 'include',
@@ -155,7 +152,6 @@ export default function Dashboard() {
     };
 
     const fetchNewsData = async (symbol, key) => {
-        const xsrfToken = await getXSRFTokenFromCookie();
         const response = await fetch(`${SERVER_URL}s3/retrieve?key=stock_news/${symbol}/${key}.json`, {
             method: 'GET',
             credentials: 'include',
@@ -169,7 +165,6 @@ export default function Dashboard() {
     };
 
     const newGenerateNews = async (stockSymbol) => {
-        const xsrfToken = await getXSRFTokenFromCookie();
         setSelectedStock(stockSymbol);
         const response = await fetch(`${SERVER_URL}news/generate?symbol=${stockSymbol}`, {
             method: 'POST',
@@ -218,7 +213,9 @@ export default function Dashboard() {
             if (tokenFromCookie) {
                 xsrfTokenCache = decodeURIComponent(tokenFromCookie[1]); // now cache it properly
             }
-    
+
+            xsrfToken = xsrfTokenCache;
+        
             await debugSession(); // confirm it's in session
             const userExists = await checkUser();
             if (!userExists) await addUser();
