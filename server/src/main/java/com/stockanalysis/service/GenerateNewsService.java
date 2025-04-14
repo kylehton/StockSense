@@ -1,12 +1,12 @@
 package com.stockanalysis.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
-import io.github.cdimascio.dotenv.Dotenv;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,10 +45,11 @@ public class GenerateNewsService {
     }
     
     public String[][] generateNews(String stockSymbol) {
-        Dotenv dotenv = Dotenv.load();
 
         String[][] newsInfo = new String[4][5];
-        String api_key = dotenv.get("AV_API_KEY");
+
+        @Value("${AV_API_KEY}")
+        String api_key;
         // Alpha Vantage API URL
         String apiCallURL = "https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=" + stockSymbol + "&apikey=" + api_key;
                         
