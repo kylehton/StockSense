@@ -19,7 +19,7 @@ public class AWSConfig {
 
     public AWSConfig(
         @Value("${AWS_BUCKET_NAME:}") String bucketName,
-        @Value("${AWS_ACCESS_KEY:}") String accessKey,
+        @Value("${AWS_ACCESS_KEY_ID:}") String accessKey,
         @Value("${AWS_SECRET_ACCESS_KEY:}") String secretKey,
         @Value("${AWS_REGION:}") String region
     ) {
