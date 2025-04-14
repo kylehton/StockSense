@@ -92,7 +92,7 @@ export default function Dashboard() {
     }
 
     async function checkUser() {
-        const response = await fetch('${SERVER_URL}db/check', {
+        const response = await fetch(`${SERVER_URL}db/check`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -109,7 +109,7 @@ export default function Dashboard() {
 
     async function addUser() {
             console.log("User does not exist, creating new user.")
-            const response = await fetch('${SERVER_URL}db/adduser', {
+            const response = await fetch(`${SERVER_URL}db/adduser`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -125,7 +125,7 @@ export default function Dashboard() {
 
     async function loadWatchlist() {
         console.log("Loading watchlist.");
-        const response = await fetch('${SERVER_URL}db/getsymbols', {
+        const response = await fetch(`${SERVER_URL}db/getsymbols`, {
             method: 'GET',
             credentials: 'include',
             headers: {

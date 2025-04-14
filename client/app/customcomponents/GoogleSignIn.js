@@ -2,11 +2,11 @@
 import dotenv from "dotenv";
 import { useEffect } from "react";
 import { useRouter } from 'next/navigation';  
-dotenv.config();
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+
 
 const GoogleSignIn = () => {
     dotenv.config();
+    const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
     const clientID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const router = useRouter();
 
@@ -69,7 +69,7 @@ const GoogleSignIn = () => {
         const payload = JSON.parse(atob((response.credential).split(".")[1]));
         
 
-        const res = await fetch(`https://stocksense-server.up.railway.app/google/auth?id=${response.credential}`, {
+        const res = await fetch(`${SERVER_URL}/google/auth?id=${response.credential}`, {
           method: "POST",
           credentials: "include", 
           headers: {
