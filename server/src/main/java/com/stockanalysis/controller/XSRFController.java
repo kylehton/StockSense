@@ -15,19 +15,24 @@ import java.util.Map;
 @RequestMapping
 public class XSRFController {
 
-    private static final Logger logger = LoggerFactory.getLogger(XSRFController.class);
+    @RestController
+@RequestMapping
+public class XSRFController {
 
     @GetMapping("/xsrf")
     public ResponseEntity<Map<String, String>> getXsrfToken(HttpServletRequest request) {
         CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 
         if (csrfToken == null) {
-            logger.warn("❌ CSRF token not found in request attributes.");
             return ResponseEntity.badRequest().body(Map.of("error", "XSRF token not found"));
         }
 
-        logger.info("✅ CSRF token fetched: token={}, session={}", csrfToken.getToken(), request.getSession().getId());
+        csrfToken.getToken(); // ✅ Force generation and session storage
 
-        return ResponseEntity.ok(Map.of("token", csrfToken.getToken()));
+        return ResponseEntity.ok()
+                .header("X-XSRF-TOKEN", csrfToken.getToken())
+                .body(Map.of("token", csrfToken.getToken()));
     }
+}
+
 }
