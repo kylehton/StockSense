@@ -25,6 +25,23 @@ export default function Dashboard() {
     const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
     let xsrfToken = null;
+
+    const fetchAndCacheXsrf = async () => {
+        const res = await fetch(`${SERVER_URL}xsrf`, {
+          method: 'GET',
+          credentials: 'include',
+        });
+      
+        await new Promise(resolve => setTimeout(resolve, 100)); // 🔁 allow cookie to sync
+      
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        if (match) {
+          xsrfTokenCache = decodeURIComponent(match[1]);
+          console.log("🔐 CSRF token cached:", xsrfTokenCache);
+        } else {
+          console.warn("⚠️ CSRF cookie not found after /xsrf fetch");
+        }
+      };      
     
 
     const getXSRFToken = async () => {
@@ -196,20 +213,7 @@ export default function Dashboard() {
     useEffect(() => {
         async function initialize() {
           await debugSession(); // Confirm session is active
-      
-          // ✅ Get CSRF token from `/xsrf`, which sets it in both response and cookie
-          const xsrf = await getXSRFToken();
-      
-          // ✅ Wait briefly for Set-Cookie to sync
-          await new Promise((resolve) => setTimeout(resolve, 100));
-      
-          // ✅ Read XSRF-TOKEN from cookie (now guaranteed to exist)
-          const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-          if (match) {
-            xsrfToken = decodeURIComponent(match[1]);
-          }
-      
-          console.log("🧪 CSRF Token (header):", xsrfToken);
+          await fetchAndCacheXsrf();
           await debugSession();
       
           const userExists = await checkUser();
