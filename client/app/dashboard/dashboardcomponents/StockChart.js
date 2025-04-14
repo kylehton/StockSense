@@ -29,7 +29,6 @@ const StockChart = ({ symbol }) => {
     const prices = data.chart.result[0].indicators.quote[0];
     const currentPrice = data.chart.result[0].meta.regularMarketPrice;
     const prevPrice = data.chart.result[0].meta.chartPreviousClose;
-    console.log("maybe closing:", prices.close[250])
 
     setMarketPrice(currentPrice);
     setPrevClosing(prevPrice);
@@ -51,7 +50,14 @@ const StockChart = ({ symbol }) => {
         close: prices.close[i],
     }));
 
-    const closingPrice = (formatted.find(entry => entry.time === dateInUnix)).open; //yesterday's closing price
+    const closingPrice = formatted.find(entry => Number(entry.time) === Number(dateInUnix));
+
+    if (closingPrice) {
+      console.log("Open price:", closingPrice.open);
+    } else {
+      console.error("No entry found for Unix time:", dateInUnix);
+    }
+    
     setPrevClosing(closingPrice)
     setData(formatted);
   };
