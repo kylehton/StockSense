@@ -23,13 +23,7 @@ export default function Dashboard() {
     const [newsItems, setNewsItems] = useState([]);
     const [selectedStock, setSelectedStock] = useState("");
     const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
-
-    let xsrfTokenCache = null;
-
-    const getXSRFTokenFromCookie = async ()  => {
-        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-        return match ? decodeURIComponent(match[1]) : null;
-    }      
+    
 
     const getXSRFToken = async () => {
         if (xsrfTokenCache) return xsrfTokenCache;
@@ -201,10 +195,6 @@ export default function Dashboard() {
 
     useEffect(() => {
         async function initialize() {
-            await debugSession();
-            await fetch(`${SERVER_URL}xsrf`, { credentials: 'include' });
-            await new Promise(resolve => setTimeout(resolve, 50));
-            xsrfTokenCache = await getXSRFTokenFromCookie();
             await debugSession();
             const userExists = await checkUser();
             if (!userExists) await addUser();
