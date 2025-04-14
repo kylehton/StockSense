@@ -58,6 +58,7 @@ public class DBController {
     @GetMapping("/check")
     public Boolean checkUser(HttpSession session) {
         try {
+            System.out.println("Current session: "+session.getId());
             System.out.println("Searching for user id: "+session.getAttribute("USER_ID"));
             String google_id = session.getAttribute("USER_ID").toString();
             return dbService.checkUserExists(google_id, this.stmt);
