@@ -1,7 +1,6 @@
 'use client';
 import './dashboard.css';
 import React, { useState, useEffect } from 'react';
-import dotenv from "dotenv";
 import { MinusIcon } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,44 +14,41 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-
 import StockChart from './dashboardcomponents/StockChart';
 
 export default function Dashboard() {
-
-    // variables for user's stock watchlist
     const [watchlist, setWatchlist] = useState([]);
-    // variables for adding a stock symbol
     const [symbol, setSymbol] = useState("");
-    // variables for dialog box
     const [open, setOpen] = useState(false);
-    // variables for stock news data
     const [newsItems, setNewsItems] = useState([]);
     const [selectedStock, setSelectedStock] = useState("");
-
-    dotenv.config();
     const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
-    function getCookie(name) {
-        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-        return match ? match[2] : null;
-      }
+    // Cache for CSRF token
+    let xsrfTokenCache = null;
 
     const getXSRFToken = async () => {
-        const xsrfToken = await fetch(`${SERVER_URL}xsrf`, {
+        if (xsrfTokenCache) return xsrfTokenCache;
+        const res = await fetch(`${SERVER_URL}xsrf`, {
             method: 'GET',
             credentials: 'include',
-        })
-        const data = await xsrfToken.json();
-        return data.token; // return XSRF token value
-    }
+        });
+        const data = await res.json();
+        xsrfTokenCache = data.token;
+        return data.token;
+    };
 
+    const debugSession = async () => {
+        const res = await fetch(`${SERVER_URL}debug/session`, {
+            method: 'GET',
+            credentials: 'include',
+        });
+        const data = await res.json();
+        console.log("🧪 DEBUG SESSION INFO:", data);
+    };
 
     const handleAddSymbol = async () => {
-        console.log("Adding symbol:", symbol);
-
         const xsrfToken = await getXSRFToken();
-
         const response = await fetch(`${SERVER_URL}db/addsymbol?symbol=${symbol}`, {
             method: 'POST',
             credentials: 'include',
@@ -62,9 +58,7 @@ export default function Dashboard() {
             }
         })
         .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.text();
         })
         .catch((error) => console.error("Error adding symbol:", error));
@@ -75,8 +69,6 @@ export default function Dashboard() {
 
     const handleDeleteSymbol = async (stockSymbol) => {
         const xsrfToken = await getXSRFToken();
-        console.log("XSRF Token:", xsrfToken);
-        console.log("Deleting symbol:", stockSymbol);
         const response = await fetch(`${SERVER_URL}db/deletesymbol?symbol=${stockSymbol}`, {
             method: 'DELETE',
             credentials: 'include',
@@ -86,75 +78,50 @@ export default function Dashboard() {
             }
         })
         .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.text();
         })
         .catch((error) => console.error("Error deleting symbol:", error));
-        setSymbol("");
         await loadWatchlist();
-    }
+    };
 
     async function checkUser() {
         const response = await fetch(`${SERVER_URL}db/check`, {
             method: 'GET',
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const result = await response.json();
-        console.log("User exists:", result);
-        return await result;
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return await response.json();
     }
 
     async function addUser() {
-            const xsrfToken = await getXSRFToken();
-            console.log("User does not exist, creating new user.")
-            const response = await fetch(`${SERVER_URL}db/adduser`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'X-XSRF-TOKEN': xsrfToken,
-                    'Content-Type': 'application/json',
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+        const xsrfToken = await getXSRFToken();
+        const response = await fetch(`${SERVER_URL}db/adduser`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'X-XSRF-TOKEN': xsrfToken,
+                'Content-Type': 'application/json',
             }
-            const result = await response.json();
-            console.log("Result of add:", result);
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return await response.json();
     }
 
     async function loadWatchlist() {
-        console.log("Loading watchlist.");
         const response = await fetch(`${SERVER_URL}db/getsymbols`, {
             method: 'GET',
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then((data) => {
-            console.log("Watchlist data:", data);
-            setWatchlist(data); 
-        })
-        .catch((error) => console.error("Error loading watchlist:", error));
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const data = await response.json();
+        setWatchlist(data);
     }
 
     const setNewsKey = async (stockSymbol, key) => {
         const xsrfToken = await getXSRFToken();
-        console.log("Setting news key for:", stockSymbol);
         const response = await fetch(`${SERVER_URL}db/setnewskey?symbol=${stockSymbol}&key=${key}`, {
             method: 'POST',
             credentials: 'include',
@@ -162,17 +129,13 @@ export default function Dashboard() {
                 'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
-        })
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const returnKey = await response.text();
-        return returnKey;
-    }
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return await response.text();
+    };
 
     const fetchNewsKey = async (stockSymbol) => {
         const xsrfToken = await getXSRFToken();
-        console.log("Retrieving stock data for:", stockSymbol);
         const response = await fetch(`${SERVER_URL}db/getnewskey?symbol=${stockSymbol}`, {
             method: 'GET',
             credentials: 'include',
@@ -180,17 +143,13 @@ export default function Dashboard() {
                 'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
-        })
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const key = await response.text();
-        return key;
-    }
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return await response.text();
+    };
 
     const fetchNewsData = async (symbol, key) => {
         const xsrfToken = await getXSRFToken();
-        console.log("Retrieving stock data for:", key);
         const response = await fetch(`${SERVER_URL}s3/retrieve?key=stock_news/${symbol}/${key}.json`, {
             method: 'GET',
             credentials: 'include',
@@ -198,18 +157,14 @@ export default function Dashboard() {
                 'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
-        })
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const newsText = await response.text();
-        return newsText;
-    }
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return await response.text();
+    };
 
     const newGenerateNews = async (stockSymbol) => {
         const xsrfToken = await getXSRFToken();
-        console.log("GENERATING NEW NEWS:", stockSymbol);
-        setSelectedStock(stockSymbol); // Set the selected stock
+        setSelectedStock(stockSymbol);
         const response = await fetch(`${SERVER_URL}news/generate?symbol=${stockSymbol}`, {
             method: 'POST',
             credentials: 'include',
@@ -217,56 +172,44 @@ export default function Dashboard() {
                 'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
-        })
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const keyResponse = await response.text();
-            const newsKey = await setNewsKey(stockSymbol, keyResponse);
-            const newsText = await fetchNewsData(stockSymbol, newsKey);
-            return newsText;
-    }
+        });
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const keyResponse = await response.text();
+        const newsKey = await setNewsKey(stockSymbol, keyResponse);
+        const newsText = await fetchNewsData(stockSymbol, newsKey);
+        return newsText;
+    };
 
     const handleStockDataOpen = async (stockSymbol) => {
         try {
-            setSelectedStock(stockSymbol); // Always set first so UI shows heading
+            setSelectedStock(stockSymbol);
             let retrieveKey = await fetchNewsKey(stockSymbol);
             let newsText = await fetchNewsData(stockSymbol, retrieveKey);
-    
             if (!newsText || newsText.trim() === "") {
                 newsText = await newGenerateNews(stockSymbol);
             }
-    
             const splitNews = JSON.parse(newsText);
-            const storeItems = [];
-    
-            const numItems = splitNews[0].length;
-            for (let i = 0; i < numItems; i++) {
-                storeItems.push({
-                    title: splitNews[0][i],
-                    publisher: splitNews[1][i],
-                    url: splitNews[2][i],
-                    score: splitNews[3][i]
-                });
-            }
+            const storeItems = splitNews[0].map((_, i) => ({
+                title: splitNews[0][i],
+                publisher: splitNews[1][i],
+                url: splitNews[2][i],
+                score: splitNews[3][i]
+            }));
             setNewsItems(storeItems);
         } catch (error) {
             console.error("Error loading news data:", error);
-            setNewsItems([]); // fallback to empty news instead of leaving old one or nothing
+            setNewsItems([]);
         }
     };
-    
-    
 
     useEffect(() => {
         async function initialize() {
+            await debugSession(); //  check session + csrf on first call
             const userExists = await checkUser();
-            if (!userExists) {
-                await addUser();
-            }
+            if (!userExists) await addUser();
+            await getXSRFToken(); // set + cache it only once after session stabilized
             await loadWatchlist();
         }
-        
         initialize();
     }, []);
 
