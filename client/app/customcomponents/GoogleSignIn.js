@@ -97,7 +97,7 @@ const GoogleSignIn = () => {
   
     return (
       <div id="signin-container">
-        <div id="sign-in-button"></div> {/* Google sign-in button will be rendered here */}
+        <div id="sign-in-button" className="justify-center"></div> {/* Google sign-in button will be rendered here */}
       </div>
     );
 };
