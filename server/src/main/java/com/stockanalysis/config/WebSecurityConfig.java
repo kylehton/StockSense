@@ -84,26 +84,32 @@ public class WebSecurityConfig {
             .addFilterBefore(new OncePerRequestFilter() {
                 @Override
                 protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
-                                               FilterChain chain) throws ServletException, IOException {
+                                                FilterChain chain) throws ServletException, IOException {
                     HttpSession session = request.getSession(false);
-
+            
                     if (session != null) {
                         Object userId = session.getAttribute("USER_ID");
-                        if (userId != null) {
-                            Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
-                            if (currentAuth == null || !currentAuth.isAuthenticated()) {
-                                List<GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("USER"));
-                                Authentication auth = new UsernamePasswordAuthenticationToken(userId.toString(), null, authorities);
-                                SecurityContextHolder.getContext().setAuthentication(auth);
-                            }
+                        String csrfToken = (String) session.getAttribute("org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository.CSRF_TOKEN");
+            
+                        logger.debug("Session ID: {}", session.getId());
+                        logger.debug("USER_ID from session: {}", userId);
+                        logger.debug("CSRF token in session: {}", csrfToken);
+            
+                        Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+                        if (userId != null && (currentAuth == null || !currentAuth.isAuthenticated())) {
+                            List<GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("USER"));
+                            Authentication auth = new UsernamePasswordAuthenticationToken(userId.toString(), null, authorities);
+                            SecurityContextHolder.getContext().setAuthentication(auth);
                         }
                     } else {
+                        logger.debug("No session found. Clearing security context.");
                         SecurityContextHolder.clearContext(); // Allow anonymous access if no session
                     }
-
+            
                     chain.doFilter(request, response);
                 }
             }, UsernamePasswordAuthenticationFilter.class)
+            
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
                     String requestPath = request.getServletPath();
