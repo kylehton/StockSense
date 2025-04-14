@@ -35,6 +35,7 @@ public class GoogleAuthenticationController {
             session.setAttribute("USER_ID", userId);
             session.setAttribute("email", payload.get("email"));
             System.out.println("Authenticating and storing user: " + session.getAttribute("email"));
+            System.out.println("User ID: " + session.getAttribute("USER_ID"));
 
             return ResponseEntity.ok().body("Authenticated user: " + payload.get("email"));
         } catch (IOException e) {
