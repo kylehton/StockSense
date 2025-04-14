@@ -78,7 +78,7 @@ const GoogleSignIn = () => {
           },
         })
         if (res.ok) {
-          await res.json();
+          await res.text();
           if (res.ok)
             router.push('/dashboard');
         }
