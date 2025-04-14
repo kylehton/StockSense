@@ -48,7 +48,7 @@ export default function Dashboard() {
             method: 'POST',
             credentials: 'include',
             headers: {
-                'X-XSRF-Token': xsrfToken,
+                'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
         })
@@ -72,7 +72,7 @@ export default function Dashboard() {
             method: 'DELETE',
             credentials: 'include',
             headers: {
-                'X-XSRF-Token': xsrfToken,
+                'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
         })
@@ -148,7 +148,7 @@ export default function Dashboard() {
             method: 'POST',
             credentials: 'include',
             headers: {
-                'X-XSRF-Token': xsrfToken,
+                'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
         })
@@ -166,7 +166,7 @@ export default function Dashboard() {
             method: 'GET',
             credentials: 'include',
             headers: {
-                'X-XSRF-Token': xsrfToken,
+                'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
         })
@@ -184,7 +184,7 @@ export default function Dashboard() {
             method: 'GET',
             credentials: 'include',
             headers: {
-                'X-XSRF-Token': xsrfToken,
+                'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
         })
@@ -203,7 +203,7 @@ export default function Dashboard() {
             method: 'POST',
             credentials: 'include',
             headers: {
-                'X-XSRF-Token': xsrfToken,
+                'X-XSRF-TOKEN': xsrfToken,
                 'Content-Type': 'application/json',
             }
         })
