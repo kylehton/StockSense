@@ -37,13 +37,6 @@ public class AWSConfig {
 
 
     public AWSConfig() {
-        Dotenv dotenv = Dotenv.load();
-        
-        // Set the environment variables
-        this.accessKey = dotenv.get("AWS_ACCESS_KEY");
-        this.secretKey = dotenv.get("AWS_SECRET_KEY");
-        this.region = dotenv.get("AWS_REGION");
-        this.bucketName = dotenv.get("AWS_BUCKET_NAME");
 
     }
 
