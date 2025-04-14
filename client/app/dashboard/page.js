@@ -33,6 +33,11 @@ export default function Dashboard() {
     dotenv.config();
     const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
+    function getCookie(name) {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+      }
+
     const getXSRFToken = async () => {
         const xsrfToken = await fetch(`${SERVER_URL}xsrf`, {
             method: 'GET',
@@ -108,11 +113,13 @@ export default function Dashboard() {
     }
 
     async function addUser() {
+            const xsrfToken = await getXSRFToken();
             console.log("User does not exist, creating new user.")
             const response = await fetch(`${SERVER_URL}db/adduser`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
+                    'X-XSRF-TOKEN': xsrfToken,
                     'Content-Type': 'application/json',
                 }
             });
