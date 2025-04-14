@@ -26,13 +26,11 @@ export default function Dashboard() {
     
 
     const getXSRFToken = async () => {
-        if (xsrfTokenCache) return xsrfTokenCache;
         const res = await fetch(`${SERVER_URL}xsrf`, {
             method: 'GET',
             credentials: 'include',
         });
         const data = await res.json();
-        xsrfTokenCache = data.token;
         await new Promise(resolve => setTimeout(resolve, 50));
         return data.token;
     };
