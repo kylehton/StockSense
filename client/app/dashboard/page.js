@@ -36,7 +36,7 @@ export default function Dashboard() {
     });
 
     // Wait briefly to allow cookie sync across sites
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Try reading from cookie
     const cookieMatch = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
