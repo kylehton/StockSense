@@ -1,6 +1,7 @@
 'use client';
 import './dashboard.css';
 import React, { useState, useEffect } from 'react';
+import dotenv from "dotenv";
 import { MinusIcon } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,8 +30,11 @@ export default function Dashboard() {
     const [newsItems, setNewsItems] = useState([]);
     const [selectedStock, setSelectedStock] = useState("");
 
+    dotenv.config();
+    const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
+
     const getXSRFToken = async () => {
-        const xsrfToken = await fetch('http://localhost:8080/xsrf', {
+        const xsrfToken = await fetch('${SERVER_URL}xsrf', {
             method: 'GET',
             credentials: 'include',
         })
@@ -44,7 +48,7 @@ export default function Dashboard() {
 
         const xsrfToken = await getXSRFToken();
 
-        const response = await fetch(`http://localhost:8080/db/addsymbol?symbol=${symbol}`, {
+        const response = await fetch(`${SERVER_URL}db/addsymbol?symbol=${symbol}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -68,7 +72,7 @@ export default function Dashboard() {
         const xsrfToken = await getXSRFToken();
         console.log("XSRF Token:", xsrfToken);
         console.log("Deleting symbol:", stockSymbol);
-        const response = await fetch(`http://localhost:8080/db/deletesymbol?symbol=${stockSymbol}`, {
+        const response = await fetch(`${SERVER_URL}db/deletesymbol?symbol=${stockSymbol}`, {
             method: 'DELETE',
             credentials: 'include',
             headers: {
@@ -88,7 +92,7 @@ export default function Dashboard() {
     }
 
     async function checkUser() {
-        const response = await fetch('http://localhost:8080/db/check', {
+        const response = await fetch('${SERVER_URL}db/check', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -105,7 +109,7 @@ export default function Dashboard() {
 
     async function addUser() {
             console.log("User does not exist, creating new user.")
-            const response = await fetch('http://localhost:8080/db/adduser', {
+            const response = await fetch('${SERVER_URL}db/adduser', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -121,7 +125,7 @@ export default function Dashboard() {
 
     async function loadWatchlist() {
         console.log("Loading watchlist.");
-        const response = await fetch('http://localhost:8080/db/getsymbols', {
+        const response = await fetch('${SERVER_URL}db/getsymbols', {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -144,7 +148,7 @@ export default function Dashboard() {
     const setNewsKey = async (stockSymbol, key) => {
         const xsrfToken = await getXSRFToken();
         console.log("Setting news key for:", stockSymbol);
-        const response = await fetch(`http://localhost:8080/db/setnewskey?symbol=${stockSymbol}&key=${key}`, {
+        const response = await fetch(`${SERVER_URL}db/setnewskey?symbol=${stockSymbol}&key=${key}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -162,7 +166,7 @@ export default function Dashboard() {
     const fetchNewsKey = async (stockSymbol) => {
         const xsrfToken = await getXSRFToken();
         console.log("Retrieving stock data for:", stockSymbol);
-        const response = await fetch(`http://localhost:8080/db/getnewskey?symbol=${stockSymbol}`, {
+        const response = await fetch(`${SERVER_URL}db/getnewskey?symbol=${stockSymbol}`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -180,7 +184,7 @@ export default function Dashboard() {
     const fetchNewsData = async (symbol, key) => {
         const xsrfToken = await getXSRFToken();
         console.log("Retrieving stock data for:", key);
-        const response = await fetch(`http://localhost:8080/s3/retrieve?key=stock_news/${symbol}/${key}.json`, {
+        const response = await fetch(`${SERVER_URL}s3/retrieve?key=stock_news/${symbol}/${key}.json`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -199,7 +203,7 @@ export default function Dashboard() {
         const xsrfToken = await getXSRFToken();
         console.log("GENERATING NEW NEWS:", stockSymbol);
         setSelectedStock(stockSymbol); // Set the selected stock
-        const response = await fetch(`http://localhost:8080/news/generate?symbol=${stockSymbol}`, {
+        const response = await fetch(`${SERVER_URL}news/generate?symbol=${stockSymbol}`, {
             method: 'POST',
             credentials: 'include',
             headers: {
