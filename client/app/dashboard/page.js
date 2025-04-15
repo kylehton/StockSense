@@ -24,38 +24,71 @@ export default function Dashboard() {
     const [selectedStock, setSelectedStock] = useState("");
     const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
+    // Fixed getXSRFToken function for dashboard.js
     const getXSRFToken = async () => {
-      // Return cached token if available
       try {
-      
-
-      const res = await fetch(`${SERVER_URL}xsrf`, {
+        // Make request to fetch CSRF token
+        const res = await fetch(`${SERVER_URL}xsrf`, {
           method: 'GET',
-          credentials: 'include',
-      });
+          credentials: 'include', // Important for cookies
+        });
 
-      // Wait briefly to allow cookie sync across sites
-      await new Promise(resolve => setTimeout(resolve, 500));
+        if (!res.ok) {
+          throw new Error(`Failed to get XSRF token: ${res.status}`);
+        }
 
-      // Try reading from cookie
-      const cookieMatch = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-      if (cookieMatch) {
-          xsrfTokenCache = decodeURIComponent(cookieMatch[1]);
-          console.log("✅ XSRF token from cookie:", xsrfTokenCache);
-      }
+        // Parse the JSON response properly
+        const data = await res.json();
+        console.log("Token response:", data);
 
-      // Fallback: read from response JSON
-      const data = await res.text();
-      if (data.token) {
-          const xsrf = data.token;
-          console.log("✅ XSRF token from JSON:", xsrf);
-          return xsrf;
-      }
+        // If token exists in response, use it
+        if (data && data.token) {
+          console.log("✅ XSRF token from JSON:", data.token);
+          return data.token;
+        }
+
+        // Fallback to cookie - make sure to decode it
+        const cookieMatch = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        if (cookieMatch) {
+          const tokenFromCookie = decodeURIComponent(cookieMatch[1]);
+          console.log("✅ XSRF token from cookie:", tokenFromCookie);
+          return tokenFromCookie;
+        }
+
+        throw new Error("No XSRF token found in response or cookies");
       } catch (error) {
-        throw new Error("❌ Failed to retrieve CSRF token:", error);
+        console.error("❌ Failed to retrieve CSRF token:", error);
+        throw error;
       }
-    };      
-    
+    };
+
+    // Fixed addUser function
+    async function addUser() {
+      try {
+        // Get the token first
+        const token = await getXSRFToken();
+        console.log("Using token for adduser:", token);
+        
+        const response = await fetch(`${SERVER_URL}db/adduser`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': token  // Make sure header name matches Spring config
+          }
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorText}`);
+        }
+        
+        return await response.text();
+      } catch (error) {
+        console.error("Error in addUser:", error);
+        throw error;
+      }
+    }
 
     const debugSession = async () => {
         const res = await fetch(`${SERVER_URL}debug/session`, {
@@ -104,20 +137,6 @@ export default function Dashboard() {
         });
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         return await response.json();
-    }
-
-    async function addUser() {
-        const token = await getXSRFToken();
-        const response = await fetch(`${SERVER_URL}db/adduser`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'X-XSRF-TOKEN': token,
-                'Content-Type': 'application/json',
-            }
-        });
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        return await response.text();
     }
 
     async function loadWatchlist() {
@@ -222,6 +241,23 @@ export default function Dashboard() {
           if (!userExists) await addUser(); // Safe CSRF protected
           await loadWatchlist();
         }
+
+          // Debug current cookies
+          console.log("Current cookies:", document.cookie);
+          
+          // Monitor CSRF token usage
+          const originalFetch = window.fetch;
+          window.fetch = function(...args) {
+            if (args[1] && args[1].headers) {
+              const headers = args[1].headers;
+              console.log("Request URL:", args[0]);
+              console.log("Request headers:", headers);
+              if (headers['X-XSRF-TOKEN']) {
+                console.log("Using XSRF token:", headers['X-XSRF-TOKEN']);
+              }
+            }
+            return originalFetch.apply(this, args);
+          };
       
         initialize();
       }, []);      
