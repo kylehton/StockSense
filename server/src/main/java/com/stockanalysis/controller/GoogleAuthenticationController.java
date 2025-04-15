@@ -31,13 +31,14 @@ public class GoogleAuthenticationController {
 
             GoogleIdToken.Payload payload = googleAuthenticationService.authenticate(id);
             String userId = payload.getSubject();
+            String email = payload.getEmail();
             
             session.setAttribute("USER_ID", userId);
-            session.setAttribute("email", payload.get("email"));
+            session.setAttribute("email", email);
             System.out.println("Authenticating and storing user: " + session.getAttribute("email"));
             System.out.println("Session ID: " + session.getId());
 
-            return ResponseEntity.ok().body("Authenticated user: " + payload.get("email"));
+            return ResponseEntity.ok().body("Authenticated user: " + session.getAttribute("email"));
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Authentication error: " + e.getMessage());
         }
