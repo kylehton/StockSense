@@ -34,7 +34,7 @@ public class DBService {
         try {
             Connection conn = stmt.getConnection();
             // Use PreparedStatement to prevent SQL injection
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO users (email, google_id) VALUES (?, ?) ON CONFLICT (email, google_id) DO NOTHING");
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO users (email, google_id) VALUES (?, ?)");
             pstmt.setString(1, email);
             pstmt.setString(2, google_id);
             
