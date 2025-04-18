@@ -1,7 +1,11 @@
-### StockSense ###
+# StockSense #
 
-# Overview #
+## Overview ##
 StockSense is a comprehensive full-stack application designed for stock market enthusiasts to track their favorite stocks, visualize market data, and analyze news sentiment. Built with modern web technologies, StockSense provides a seamless experience for users to stay informed about their investments.
+
+## Documentation ##
+Basic Documentation (focusing more on the server-side) can be found below:
+[https://docs.google.com/document/d/1Bhy2V64S4IomPgVylwh7cgoP70y-eaUC0-QpGOc1BWU/edit?usp=sharing]
 
 ## Deployment ##
 The project is currently deployed at: [https://www.stock-sense-client.vercel.app]
@@ -51,3 +55,5 @@ Service Layer: Business logic implementation
 Data Access Layer: Database interactions
 External Services: Integration with third-party APIs
 Deployments: Scaled from usage to minimize costs and idle uptime
+
+### Thank you for going through my project repo! ###
