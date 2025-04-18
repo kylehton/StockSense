@@ -1,13 +1,12 @@
 package com.stockanalysis.config;
 
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.beans.factory.annotation.Value;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 public class DataBaseConfig {
@@ -23,30 +22,27 @@ public class DataBaseConfig {
     @Value("${DB_PASSWORD}")
     private String password;
     
-    public Statement dbStatement() {
+    public Statement dbStatement() throws SQLException {
         // Connect to the PostgreSQL database
-        try {
-            this.conn = DriverManager.getConnection(url, user, password);
-
-            // Create a Statement object
-            Statement stmt = conn.createStatement();
-            return stmt;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        if (conn == null || conn.isClosed()) {
+            conn = DriverManager.getConnection(url, user, password);
         }
-
+        
+        // Create a Statement object
+        Statement stmt = conn.createStatement();
+        return stmt;
     }
 
     public void closeConnection(Statement stmt) {
         try {
             if (stmt != null) {
                 stmt.close();
-                (this.conn).close();
             }
-        } catch (Exception e) {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
 }
