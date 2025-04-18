@@ -28,8 +28,13 @@ public class DBController {
     
     @Autowired
     public DBController(DataBaseConfig dbConfig) {
+        try {
             this.stmt = dbConfig.dbStatement();
             this.dbService = new DBService();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize database connection", e);
+        }
     }
 
     @GetMapping("/testdb")
