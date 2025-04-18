@@ -282,7 +282,12 @@ export default function Dashboard() {
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">Symbol</Label>
-                  <Input id="name" value={symbol} onChange={(e) => setSymbol(e.target.value)} placeholder="AMZN, TSLA . . ." className="col-span-3" />
+                  <Input type="text" 
+                      maxlength="4" 
+                      pattern="[A-Z]{4}" 
+                      id="name" value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} 
+                      placeholder="AMZN, TSLA . . ." className="col-span-3"
+                      required />
                 </div>
               </div>
               <DialogFooter>

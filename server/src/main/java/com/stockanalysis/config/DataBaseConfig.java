@@ -24,9 +24,7 @@ public class DataBaseConfig {
     private String password;
     
     public Statement dbStatement() {
-
-     
-            // Connect to the PostgreSQL database
+        // Connect to the PostgreSQL database
         try {
             this.conn = DriverManager.getConnection(url, user, password);
 
