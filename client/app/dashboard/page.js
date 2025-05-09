@@ -274,12 +274,12 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]"></div>
       </div>
 
-      <div className="relative z-10 flex items-center justify-center h-[95%]">
-        <div id="watchlist-wrapper" className="rounded-2xl h-auto md:h-[90vh] w-full md:w-[600px] bg-gray-800/90 flex flex-col p-4 md:p-6 shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 border border-gray-700/50">
+      <div className="relative z-10 flex items-center justify-center">
+        <div id="watchlist-wrapper" className="rounded-2xl mt-8 h-[85vh] w-full md:w-[600px] bg-gray-800/90 flex flex-col p-4 md:p-6 shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 border border-gray-700/50">
           {/* Decorative top bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-t-2xl"></div>
           
-          <div id="watchlist-header" className="flex items-center justify-between mb-6">
+          <div id="watchlist-header" className="flex items-center justify-between mb-6 mt-2">
             <div className="flex items-center gap-3">
               <div className="w-2 h-8 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></div>
               <h1 className="font-bold text-2xl bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Watchlist</h1>
@@ -331,7 +331,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div id="watchlist-components" className="mt-4 space-y-2 overflow-y-auto pr-2">
+          <div id="watchlist-components" className="mt-4 space-y-2 overflow-y-auto pr-2 flex-1">
             {watchlist.map((stock, index) => (
               <div key={index} className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-700/50 transition-all duration-200 group border border-transparent hover:border-gray-600/50">
                 <h1 className="font-semibold text-lg">
@@ -366,13 +366,13 @@ export default function Dashboard() {
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">{selectedStock}</h1>
                   </div>
                 </div>
-                <div className="w-full">
-                  <div className="h-[150px] sm:h-[250px] md:h-[350px] mb-8 relative">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500"></div>
+                <div className="w-full flex flex-col gap-6">
+                  <div className="h-[200px] sm:h-[250px] md:h-[475px] mb-12 relative bg-gray-900/50 rounded-xl border border-gray-700/50">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500"></div>
                     <StockChart symbol={selectedStock} />
                   </div>
-                  <p className="text-xl font-semibold m-2 mt-12 mb-6 text-gray-200 flex items-center gap-2">
-                    <span className="w-1.5 h-6 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></span>
+                  <p className="text-xl font-semibold m-2 mb-6 text-gray-200 flex items-center gap-2">
+                    <span className="w-1.5 h-6 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full"></span>
                     {selectedStock} News Articles
                   </p>
                   {newsItems.map((item, index) => {
@@ -381,23 +381,23 @@ export default function Dashboard() {
                     let scoreColorClass = "bg-gray-700/50 text-gray-300";
                     let scoreGradient = "";
                     if (score >= 0.7) {
-                      scoreColorClass = "bg-green-600/90 text-white";
-                      scoreGradient = "from-green-500 to-emerald-500";
+                      scoreColorClass = "bg-emerald-600/90 text-white";
+                      scoreGradient = "from-emerald-500 to-teal-500";
                     } else if (score >= 0.3) {
-                      scoreColorClass = "bg-green-900/90 text-green-200";
-                      scoreGradient = "from-green-600 to-emerald-600";
+                      scoreColorClass = "bg-emerald-900/90 text-emerald-200";
+                      scoreGradient = "from-emerald-600 to-teal-600";
                     } else if (score <= -0.7) {
-                      scoreColorClass = "bg-red-600/90 text-white";
-                      scoreGradient = "from-red-500 to-rose-500";
+                      scoreColorClass = "bg-rose-600/90 text-white";
+                      scoreGradient = "from-rose-500 to-pink-500";
                     } else if (score <= -0.3) {
-                      scoreColorClass = "bg-red-900/90 text-red-200";
-                      scoreGradient = "from-red-600 to-rose-600";
+                      scoreColorClass = "bg-rose-900/90 text-rose-200";
+                      scoreGradient = "from-rose-600 to-pink-600";
                     }
 
                     return (
-                      <div key={index} className="flex flex-col mb-6 p-6 border border-gray-700/50 rounded-xl hover:bg-gray-700/50 transition-all duration-200 group">
+                      <div key={index} className="flex flex-col mb-6 p-6 border border-gray-700/50 rounded-xl hover:bg-gray-700/50 transition-all duration-200 group backdrop-blur-sm">
                         <div className="flex items-start justify-between gap-4">
-                          <h3 className="text-lg font-semibold mb-2 text-gray-100 group-hover:text-indigo-400 transition-colors duration-200 flex-1">{item.title}</h3>
+                          <h3 className="text-lg font-semibold mb-2 text-gray-100 group-hover:text-emerald-400 transition-colors duration-200 flex-1">{item.title}</h3>
                           <div className={`px-3 py-1.5 rounded-full font-medium ${scoreColorClass} transition-colors duration-200 shadow-md flex items-center gap-1.5 min-w-[100px] justify-center`}>
                             <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${scoreGradient}`}></div>
                             {formattedScore}
@@ -415,7 +415,7 @@ export default function Dashboard() {
                           href={item.url} 
                           target="_blank" 
                           rel="noopener noreferrer" 
-                          className="text-indigo-400 hover:text-indigo-300 text-sm font-medium hover:underline transition-colors duration-200 inline-flex items-center group/link"
+                          className="text-emerald-400 hover:text-emerald-300 text-sm font-medium hover:underline transition-colors duration-200 inline-flex items-center group/link"
                         >
                           Read more 
                           <svg className="w-4 h-4 ml-1 transform group-hover/link:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
