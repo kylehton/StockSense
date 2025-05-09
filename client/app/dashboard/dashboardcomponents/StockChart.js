@@ -72,8 +72,8 @@ const StockChart = ({ symbol }) => {
 
     console.log("Creating chart for symbol:", symbol);
     chartRef.current = createChart(chartContainerRef.current, {
-      width: 600,
-      height: 300,
+      width: 1000,
+      height: 400,
       layout: {
         background: { type: 'solid', color: '#1a1b1e' },
         textColor: '#d1d5db',
