@@ -264,46 +264,62 @@ export default function Dashboard() {
 
 
   return (
-    <div id="page-wrapper" className="text-zinc-800 flex h-screen w-full items-center justify-between">
-      <div id="watchlist-wrapper" className="rounded-lg ml-16 h-4/5 w-1/4 bg-white flex flex-col p-4">
-        <div id="watchlist-header" className="flex items-center justify-between mb-4">
-          <h1 className="font-bold text-xl">Watchlist</h1>
+    <div id="page-wrapper" className="text-zinc-200 flex h-screen w-full items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-8">
+      <div id="watchlist-wrapper" className="rounded-xl h-[90%] w-[600px] bg-gray-800 flex flex-col p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-700">
+        <div id="watchlist-header" className="flex items-center justify-between mb-6">
+          <h1 className="font-bold text-2xl bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Watchlist</h1>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button type="submit" className="ml-auto px-4">+</Button>
+              <Button type="submit" className="ml-auto px-4 bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200">+</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-zinc-900 opacity-100">
+            <DialogContent className="sm:max-w-[425px] bg-gray-800 border border-gray-700 shadow-2xl">
               <DialogHeader>
-                <DialogTitle>Add a Stock Symbol</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-xl font-semibold text-gray-100">Add a Stock Symbol</DialogTitle>
+                <DialogDescription className="text-gray-400">
                   Type the 4-character stock symbol you would like to add, then press the 'Add' button.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">Symbol</Label>
-                  <Input type="text" 
-                      maxlength="4" 
-                      pattern="[A-Z]{4}" 
-                      id="name" value={symbol} onChange={(e) => setSymbol(e.target.value.toUpperCase())} 
-                      placeholder="AMZN, TSLA . . ." className="col-span-3"
-                      required />
+                  <Label htmlFor="name" className="text-right text-gray-300">Symbol</Label>
+                  <Input 
+                    type="text" 
+                    maxLength="4" 
+                    pattern="[A-Z]{4}" 
+                    id="name" 
+                    value={symbol} 
+                    onChange={(e) => setSymbol(e.target.value.toUpperCase())} 
+                    placeholder="AMZN, TSLA . . ." 
+                    className="col-span-3 bg-gray-700 border-gray-600 text-gray-100 focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
+                    required 
+                  />
                 </div>
               </div>
               <DialogFooter>
-                <Button className='bg-white text-black font-bold' type="submit" onClick={handleAddSymbol}>Add</Button>
+                <Button className='bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-colors duration-200' type="submit" onClick={handleAddSymbol}>Add</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
 
-        <div id="watchlist-components" className="mt-4">
+        <div id="watchlist-components" className="mt-4 space-y-2 overflow-y-auto">
           {watchlist.map((stock, index) => (
-            <div key={index} className="flex items-center justify-between mb-1">
-              <h1 className="font-bold text-lg">
-                <Button onClick={() => handleStockDataOpen(stock)} variant="ghost">{stock}</Button>
+            <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 group">
+              <h1 className="font-semibold text-lg">
+                <Button 
+                  onClick={() => handleStockDataOpen(stock)} 
+                  variant="ghost" 
+                  className="hover:text-indigo-400 transition-colors duration-200 text-gray-200"
+                >
+                  {stock}
+                </Button>
               </h1>
-              <Button className='w-5 h-5 mr-[10px] bg-black' type='submit' size="icon" onClick={() => handleDeleteSymbol(stock.toString())}>
+              <Button 
+                className='w-8 h-8 bg-red-500 hover:bg-red-600 transition-colors duration-200' 
+                type='submit' 
+                size="icon" 
+                onClick={() => handleDeleteSymbol(stock.toString())}
+              >
                 <MinusIcon className='text-white' />
               </Button>
             </div>
@@ -311,41 +327,62 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div id="stock-data-wrapper" className="rounded-lg mr-16 h-[90%] w-[50%] bg-white flex flex-col items-start justify-start p-6 overflow-y-auto">
-        {selectedStock ? (
-          <>
-            <h1 className="text-2xl font-bold mb-6">{selectedStock}</h1>
-            <div className="w-full">
-              <StockChart symbol={selectedStock} />
-              <p className="text-lg font-semibold m-2 mt-10 mb-4 ">{selectedStock} News Articles</p>
-              {newsItems.map((item, index) => {
-                const score = parseFloat(item.score);
-                const formattedScore = score.toFixed(2);
-                let scoreColorClass = "bg-gray-200 text-black";
-                if (score >= 0.7) scoreColorClass = "bg-green-500 text-white";
-                else if (score >= 0.3) scoreColorClass = "bg-green-200 text-black";
-                else if (score <= -0.7) scoreColorClass = "bg-red-500 text-white";
-                else if (score <= -0.3) scoreColorClass = "bg-red-200 text-black";
+      <Dialog open={!!selectedStock} onOpenChange={() => setSelectedStock("")}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] bg-gray-800 border border-gray-700 shadow-2xl overflow-y-auto">
+          {selectedStock && (
+            <>
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">{selectedStock}</h1>
+                <Button 
+                  variant="ghost" 
+                  className="h-8 w-8 p-0 hover:bg-gray-700" 
+                  onClick={() => setSelectedStock("")}
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </Button>
+              </div>
+              <div className="w-full">
+                <StockChart symbol={selectedStock} />
+                <p className="text-xl font-semibold m-2 mt-12 mb-6 text-gray-200">{selectedStock} News Articles</p>
+                {newsItems.map((item, index) => {
+                  const score = parseFloat(item.score);
+                  const formattedScore = score.toFixed(2);
+                  let scoreColorClass = "bg-gray-700 text-gray-300";
+                  if (score >= 0.7) scoreColorClass = "bg-green-600 text-white";
+                  else if (score >= 0.3) scoreColorClass = "bg-green-900 text-green-200";
+                  else if (score <= -0.7) scoreColorClass = "bg-red-600 text-white";
+                  else if (score <= -0.3) scoreColorClass = "bg-red-900 text-red-200";
 
-                return (
-                  <div key={index} className="flex flex-col mb-4 p-4 border rounded-lg hover:bg-gray-50">
-                    <h3 className="text-md font-semibold mb-1">{item.title}</h3>
-                    <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
-                      <p>Source: {item.publisher}</p>
-                      <div className={`px-2 py-1 rounded-md font-medium ${scoreColorClass}`}>Score: {formattedScore}</div>
+                  return (
+                    <div key={index} className="flex flex-col mb-6 p-6 border border-gray-700 rounded-xl hover:bg-gray-700 transition-all duration-200 group">
+                      <h3 className="text-lg font-semibold mb-2 text-gray-100 group-hover:text-indigo-400 transition-colors duration-200">{item.title}</h3>
+                      <div className="flex justify-between items-center text-sm text-gray-400 mb-3">
+                        <p className="font-medium">Source: {item.publisher}</p>
+                        <div className={`px-3 py-1.5 rounded-full font-medium ${scoreColorClass} transition-colors duration-200`}>
+                          Score: {formattedScore}
+                        </div>
+                      </div>
+                      <a 
+                        href={item.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-indigo-400 hover:text-indigo-300 text-sm font-medium hover:underline transition-colors duration-200 inline-flex items-center"
+                      >
+                        Read more 
+                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </a>
                     </div>
-                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">Read more</a>
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          <div className="h-full w-full flex items-center justify-center">
-            <h1 className="text-2xl text-gray-500">Select a symbol from your watchlist.</h1>
-          </div>
-        )}
-      </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
