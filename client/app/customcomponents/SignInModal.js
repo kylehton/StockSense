@@ -27,13 +27,13 @@ export default function SignInModal() {
   return (
     <div>
       <div id='button-wrapper' className='relative'>
-        <Button 
+        <button 
           variant="outlined"
-          className='relative px-6 py-2 text-white border border-indigo-500/50 hover:border-indigo-400 hover:bg-indigo-500/10 font-medium text-base transition-all duration-200'
+          className='relative px-6 py-2 text-white border rounded-lg border-indigo-500/50 hover:border-indigo-400 hover:bg-indigo-500/10 font-medium text-base transition-all duration-200'
           onClick={handleOpen}
         >
-          Sign In
-        </Button>
+          SIGN IN
+        </button>
       </div>
       <Modal
         open={open}
@@ -45,7 +45,9 @@ export default function SignInModal() {
           <h2 className='text-3xl font-bold text-center mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent'>
             Welcome!
           </h2>
-          <GoogleSignIn />
+          <div className='flex justify-center'>          
+            <GoogleSignIn />
+          </div>
         </Box>
       </Modal>
     </div>
