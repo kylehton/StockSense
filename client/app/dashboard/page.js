@@ -264,7 +264,7 @@ export default function Dashboard() {
 
 
   return (
-    <div id="page-wrapper" className="text-zinc-200 min-h-screen w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 md:p-8 relative overflow-hidden">
+    <div id="page-wrapper" className="text-zinc-200 min-h-screen max-h-screen overflow-hidden w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 md:p-8 relative">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
@@ -367,7 +367,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="w-full">
-                  <div className="h-[200px] sm:h-[300px] md:h-[400px] mb-8 relative">
+                  <div className="h-[150px] sm:h-[250px] md:h-[350px] mb-8 relative">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500"></div>
                     <StockChart symbol={selectedStock} />
                   </div>
