@@ -264,7 +264,7 @@ export default function Dashboard() {
 
 
   return (
-    <div id="page-wrapper" className="text-zinc-200 min-h-screen w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8 relative overflow-hidden">
+    <div id="page-wrapper" className="text-zinc-200 min-h-screen w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 md:p-8 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
@@ -275,7 +275,7 @@ export default function Dashboard() {
       </div>
 
       <div className="relative z-10 flex items-center justify-center min-h-screen">
-        <div id="watchlist-wrapper" className="rounded-2xl h-[90vh] w-[600px] bg-gray-800/90 flex flex-col p-6 shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 border border-gray-700/50">
+        <div id="watchlist-wrapper" className="rounded-2xl h-auto md:h-[90vh] w-full md:w-[600px] bg-gray-800/90 flex flex-col p-4 md:p-6 shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 border border-gray-700/50">
           {/* Decorative top bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-t-2xl"></div>
           
@@ -288,7 +288,7 @@ export default function Dashboard() {
               <DialogTrigger asChild>
                 <Button type="submit" className="ml-auto px-4 bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 shadow-md">+</Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] bg-gray-800 border border-gray-700/50 shadow-2xl">
+              <DialogContent className="w-full max-w-[90vw] sm:max-w-[425px] bg-gray-800 border border-gray-700/50 shadow-2xl">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-semibold text-gray-100">Add a Stock Symbol</DialogTitle>
                   <DialogDescription className="text-gray-400">
@@ -367,7 +367,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="w-full">
-                  <div className="h-[400px] mb-8 relative">
+                  <div className="h-[200px] sm:h-[300px] md:h-[400px] mb-8 relative">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500"></div>
                     <StockChart symbol={selectedStock} />
                   </div>
