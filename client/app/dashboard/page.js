@@ -274,8 +274,8 @@ export default function Dashboard() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]"></div>
       </div>
 
-      <div className="relative z-10 flex items-center justify-center min-h-screen">
-        <div id="watchlist-wrapper" className="rounded-2xl h-[90%] w-full md:w-[600px] bg-gray-800/90 flex flex-col p-4 md:p-6 shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 border border-gray-700/50">
+      <div className="relative z-10 flex items-center justify-center h-[95%]">
+        <div id="watchlist-wrapper" className="rounded-2xl h-auto md:h-[90vh] w-full md:w-[600px] bg-gray-800/90 flex flex-col p-4 md:p-6 shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 border border-gray-700/50">
           {/* Decorative top bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-t-2xl"></div>
           

@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import GoogleSignIn from './GoogleSignIn';
 
@@ -30,7 +29,7 @@ export default function SignInModal() {
       <div id='button-wrapper' className='relative group'>
         <div className='absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200'></div>
         <Button 
-          className='relative px-6 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:border-indigo-500 transition-all duration-200 font-medium text-base'
+          className='outlined relative px-6 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 font-medium text-base'
           onClick={handleOpen}
         >
           Sign In
