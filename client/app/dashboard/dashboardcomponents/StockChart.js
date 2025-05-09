@@ -75,30 +75,45 @@ const StockChart = ({ symbol }) => {
       width: 600,
       height: 300,
       layout: {
-        backgroundColor: '#000000',
-        textColor: '#ffffff',
+        background: { type: 'solid', color: '#1a1b1e' },
+        textColor: '#d1d5db',
       },
       grid: {
-        vertLines: { color: '#444' },
-        horzLines: { color: '#444' },
+        vertLines: { color: '#2d2d2d' },
+        horzLines: { color: '#2d2d2d' },
       },
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
+        borderColor: '#2d2d2d',
       },
       crosshair: {
         mode: 1,
+        vertLine: {
+          color: '#4f46e5',
+          width: 1,
+          style: 1,
+          labelBackgroundColor: '#4f46e5',
+        },
+        horzLine: {
+          color: '#4f46e5',
+          width: 1,
+          style: 1,
+          labelBackgroundColor: '#4f46e5',
+        },
+      },
+      rightPriceScale: {
+        borderColor: '#2d2d2d',
       },
     });
-    chartRef.current.timeScale().applyOptions({
-      fixLeftEdge: true,
-      fixRightEdge: true,
-      barSpacing: 5,
-      timeVisible: true,
-      rightOffset: 0
-    });
 
-    seriesRef.current = chartRef.current.addSeries(CandlestickSeries);
+    seriesRef.current = chartRef.current.addSeries(CandlestickSeries, {
+      upColor: '#22c55e',
+      downColor: '#ef4444',
+      borderVisible: false,
+      wickUpColor: '#22c55e',
+      wickDownColor: '#ef4444',
+    });    
     console.log("Setting data for chart:", data);
     seriesRef.current.setData(data);
 
@@ -108,13 +123,28 @@ const StockChart = ({ symbol }) => {
   }, [data]);
 
   return (
-    <div id="stock-chart-data-wrapper" className="flex flex-col">
+    <div id="stock-chart-data-wrapper" className="flex flex-col bg-[#1a1b1e] rounded-xl p-6 shadow-lg">
         <div id="stock-chart-container" ref={chartContainerRef}
-          style={{ position: 'relative', width: '600px' }}
+          style={{ position: 'relative', width: '100%' }}
+          className="rounded-lg overflow-hidden"
         />
-        <div id="stock-data-container" className="flex flex-col ml-2">
-            <p className="mb-2">Price: {marketPrice}</p>
-            <p className="mb-2">Prev. Closing: {prevClosing}</p>
+        <div id="stock-data-container" className="flex justify-between items-center mt-4 px-2">
+            <div className="flex items-center space-x-4">
+                <div className="flex flex-col">
+                    <span className="text-gray-400 text-sm">Current Price</span>
+                    <span className="text-white text-xl font-semibold">${marketPrice?.toFixed(2)}</span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-gray-400 text-sm">Previous Close</span>
+                    <span className="text-white text-xl font-semibold">${prevClosing?.close?.toFixed(2)}</span>
+                </div>
+            </div>
+            <div className="flex items-center space-x-2">
+                <span className={`text-sm font-medium ${marketPrice > prevClosing?.close ? 'text-green-500' : 'text-red-500'}`}>
+                    {marketPrice > prevClosing?.close ? '↑' : '↓'} 
+                    {((marketPrice - prevClosing?.close) / prevClosing?.close * 100).toFixed(2)}%
+                </span>
+            </div>
         </div>
     </div>
   );

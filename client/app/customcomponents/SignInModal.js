@@ -12,10 +12,12 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: '#888',
-  boxShadow: 6,
+  bgcolor: 'rgba(31, 41, 55, 0.95)',
+  backdropFilter: 'blur(8px)',
+  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
   p: 4,
-  borderRadius: '4px',
+  borderRadius: '1rem',
+  border: '1px solid rgba(75, 85, 99, 0.4)',
 };
 
 export default function SignInModal() {
@@ -25,8 +27,14 @@ export default function SignInModal() {
 
   return (
     <div>
-        <div id='button-wrapper' className='border border-white rounded-md'>
-      <Button className='text-white bg-zinc-600' onClick={handleOpen}>Sign In</Button>
+      <div id='button-wrapper' className='relative group'>
+        <div className='absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200'></div>
+        <Button 
+          className='relative px-6 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 hover:border-indigo-500 transition-all duration-200 font-medium text-base'
+          onClick={handleOpen}
+        >
+          Sign In
+        </Button>
       </div>
       <Modal
         open={open}
@@ -35,8 +43,8 @@ export default function SignInModal() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <h2 className='rounded-lg text-4xl font-bold text-center mb-4'>
-            Sign in:
+          <h2 className='text-3xl font-bold text-center mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent'>
+            Welcome Back
           </h2>
           <GoogleSignIn />
         </Box>
