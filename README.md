@@ -55,5 +55,3 @@ Service Layer: Business logic implementation
 Data Access Layer: Database interactions
 External Services: Integration with third-party APIs
 Deployments: Scaled from usage to minimize costs and idle uptime
-
-### Thank you for going through my project repo! ###
