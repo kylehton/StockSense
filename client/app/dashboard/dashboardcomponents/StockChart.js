@@ -12,7 +12,6 @@ const StockChart = ({ symbol }) => {
   const rapidAPIKey = process.env.NEXT_PUBLIC_RAPIDAPI_KEY;
 
   const getStockData = async () => {
-    console.log("Fetching stock data for symbol:", symbol);
     const response = await fetch(
         `https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-chart?interval=15m&symbol=${symbol}&range=5d&region=US`,
         {
@@ -38,9 +37,6 @@ const StockChart = ({ symbol }) => {
     dateToCheck.setDate(todaysDate.getDate() - 1)
     dateToCheck.setHours(16, 45, 0, 0)
     const dateInUnix = Math.floor(dateToCheck/1000);
-    console.log(todaysDate)
-    console.log(dateToCheck)
-    console.log("Yest closing time:", dateInUnix)
 
     const formatted = timestamps.map((t, i) => ({
         time: t,
@@ -52,9 +48,7 @@ const StockChart = ({ symbol }) => {
 
     const closingPrice = formatted.find(entry => Number(entry.time) === Number(dateInUnix));
 
-    if (closingPrice) {
-      console.log("Open price:", closingPrice.open);
-    } else {
+    if (!closingPrice) {
       console.error("No entry found for Unix time:", dateInUnix);
     }
     
@@ -67,10 +61,8 @@ const StockChart = ({ symbol }) => {
   }, [symbol]);
 
   useEffect(() => {
-    console.log("Checking chart")
     if (!chartContainerRef.current || data.length === 0) return;
 
-    console.log("Creating chart for symbol:", symbol);
     chartRef.current = createChart(chartContainerRef.current, {
       width: 1200,
       height: 375,
@@ -114,7 +106,6 @@ const StockChart = ({ symbol }) => {
       wickUpColor: '#22c55e',
       wickDownColor: '#ef4444',
     });    
-    console.log("Setting data for chart:", data);
     seriesRef.current.setData(data);
 
     return () => {

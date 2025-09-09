@@ -39,11 +39,9 @@ export default function Dashboard() {
 
         // Parse the JSON response properly
         const data = await res.json();
-        console.log("Token response:", data);
 
         // If token exists in response, use it
         if (data && data.token) {
-          console.log("✅ XSRF token from JSON:", data.token);
           return data.token;
         }
 
@@ -51,7 +49,6 @@ export default function Dashboard() {
         const cookieMatch = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
         if (cookieMatch) {
           const tokenFromCookie = decodeURIComponent(cookieMatch[1]);
-          console.log("✅ XSRF token from cookie:", tokenFromCookie);
           return tokenFromCookie;
         }
 
@@ -67,7 +64,6 @@ export default function Dashboard() {
       try {
         // Get the token first
         const token = await getXSRFToken();
-        console.log("Using token for adduser:", token);
         
         const response = await fetch(`${SERVER_URL}db/adduser`, {
           method: 'POST',
@@ -96,7 +92,6 @@ export default function Dashboard() {
             credentials: 'include',
         });
         const data = await res.json();
-        console.log("🧪 DEBUG SESSION INFO:", data);
     };
 
     const handleAddSymbol = async () => {
@@ -243,18 +238,13 @@ export default function Dashboard() {
         }
 
           // Debug current cookies
-          console.log("Current cookies:", document.cookie);
           
           // Monitor CSRF token usage
           const originalFetch = window.fetch;
           window.fetch = function(...args) {
             if (args[1] && args[1].headers) {
               const headers = args[1].headers;
-              console.log("Request URL:", args[0]);
-              console.log("Request headers:", headers);
-              if (headers['X-XSRF-TOKEN']) {
-                console.log("Using XSRF token:", headers['X-XSRF-TOKEN']);
-              }
+            
             }
             return originalFetch.apply(this, args);
           };
