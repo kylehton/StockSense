@@ -64,7 +64,7 @@ const StockChart = ({ symbol }) => {
     if (!chartContainerRef.current || data.length === 0) return;
 
     chartRef.current = createChart(chartContainerRef.current, {
-      width: 1200,
+      width: '95%',
       height: 375,
       layout: {
         background: { type: 'solid', color: '#1a1b1e' },
